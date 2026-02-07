@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your AI Readiness Results | FigSamurai</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .results-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results-header {
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--color-bg-tertiary);
+        }
+
+        .results-main {
+            flex: 1;
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .results-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Score Hero */
+        .score-hero {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(139, 115, 85, 0.2);
+            color: var(--color-bronze-light);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .score-hero h1 {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .score-hero p {
+            color: var(--color-text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Score Card */
+        .score-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-bg-tertiary);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .score-circle-large {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto var(--spacing-lg);
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--color-bronze-light) calc(var(--score) * 1%),
+                var(--color-bg-tertiary) calc(var(--score) * 1%)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .score-circle-large::before {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: var(--color-bg-card);
+            border-radius: 50%;
+        }
+
+        .score-number {
+            position: relative;
+            z-index: 1;
+            font-size: 3.5rem;
+            font-weight: 800;
+        }
+
+        .score-number span {
+            font-size: 1.5rem;
+            color: var(--color-text-muted);
+        }
+
+        .tier-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .tier-name.apprentice { color: var(--color-bronze); }
+        .tier-name.warrior { color: var(--color-bronze-light); }
+        .tier-name.master { color: var(--color-fig-red); }
+
+        .tier-description {
+            color: var(--color-text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .result-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+        }
+
+        .result-card h3 {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            font-size: 1rem;
+        }
+
+        .result-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm);
+            color: var(--color-bronze-light);
+        }
+
+        /* Recommendation */
+        .recommendation {
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(139, 115, 85, 0.1) 0%, rgba(196, 30, 58, 0.05) 100%);
+            border: 1px solid var(--color-bronze);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .recommendation h4 {
+            color: var(--color-bronze-light);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .recommendation p {
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+        }
+
+        .recommendation strong {
+            color: var(--color-text-primary);
+        }
+
+        /* Next Steps */
+        .next-steps {
+            list-style: none;
+        }
+
+        .next-steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) 0;
+            color: var(--color-text-secondary);
+        }
+
+        .next-steps .step-num {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-tertiary);
+            color: var(--color-bronze-light);
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Services Match */
+        .services-match {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .service-match-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .match-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--color-bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .match-fill {
+            height: 100%;
+            background: var(--gradient-bronze);
+            border-radius: 4px;
+        }
+
+        .match-label {
+            width: 100px;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+
+        .match-percent {
+            width: 40px;
+            text-align: right;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-bronze-light);
+        }
+
+        /* CTA Section */
+        .results-cta {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-bg-tertiary);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            text-align: center;
+        }
+
+        .results-cta h2 {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .results-cta p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-lg);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="results-page">
+    <!-- Header -->
+    <header class="results-header">
+        <div class="container">
+            <a href="/" class="logo">
+                <svg class="logo-icon" width="32" height="32" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+                    <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                </svg>
+                <span class="logo-text">Fig<span class="logo-highlight">Samurai</span></span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="results-main">
+        <div class="container">
+            <div class="results-container">
+                <!-- Score Hero -->
+                <div class="score-hero">
+                    <div class="score-badge">Assessment Complete</div>
+                    <h1>Your AI Readiness Results</h1>
+                    <p id="userName">Here's where you stand on your AI journey.</p>
+                </div>
+
+                <!-- Score Card -->
+                <div class="score-card">
+                    <div class="score-circle-large" id="scoreCircle" style="--score: 0">
+                        <div class="score-number"><span id="scoreValue">0</span><span>/100</span></div>
+                    </div>
+                    <div class="tier-name" id="tierName">Calculating...</div>
+                    <p class="tier-description" id="tierDesc">Loading your personalized analysis...</p>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="results-grid">
+                    <!-- Recommendation -->
+                    <div class="result-card">
+                        <h3>
+                            <span class="result-icon">&#9733;</span>
+                            Our Recommendation
+                        </h3>
+                        <div class="recommendation" id="recommendation">
+                            <h4>Recommended Tier</h4>
+                            <p id="recommendationText">Loading...</p>
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="result-card">
+                        <h3>
+                            <span class="result-icon">&#10148;</span>
+                            Your Next Steps
+                        </h3>
+                        <ul class="next-steps" id="nextSteps">
+                            <li><span class="step-num">1</span> Loading...</li>
+                        </ul>
+                    </div>
+
+                    <!-- Services Match -->
+                    <div class="result-card">
+                        <h3>
+                            <span class="result-icon">&#9881;</span>
+                            Best Services For You
+                        </h3>
+                        <div class="services-match" id="servicesMatch">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Investment ROI -->
+                    <div class="result-card">
+                        <h3>
+                            <span class="result-icon">&#128200;</span>
+                            Potential Impact
+                        </h3>
+                        <div class="recommendation">
+                            <h4>With the Right AI Strategy</h4>
+                            <p id="impactText">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="results-cta">
+                    <h2>Ready to Take the Next Step?</h2>
+                    <p>Let's discuss how FigSamurai can help you achieve your AI goals.</p>
+                    <div class="cta-buttons">
+                        <a href="https://calendly.com/figsamurai/consultation" class="btn btn-primary btn-large" target="_blank">Book a Free Consultation</a>
+                        <a href="case-study.html" class="btn btn-secondary btn-large">See Our Work</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tier definitions with full details
+        const tiers = {
+            apprentice: {
+                name: 'Apprentice',
+                class: 'apprentice',
+                description: 'You\'re at the beginning of your AI journey. This is actually a great place to be — you can build on solid foundations without inheriting legacy AI debt.',
+                recommendation: 'We recommend starting with <strong>FigSamurai Academy</strong> to build AI literacy across your team, combined with a <strong>Studio</strong> project to get quick wins that demonstrate ROI.',
+                nextSteps: [
+                    'Complete our AI Fundamentals course (included in Academy)',
+                    'Identify 1-2 quick-win automation opportunities',
+                    'Schedule a consultation to map your AI roadmap',
+                    'Consider a pilot Studio project to prove value fast'
+                ],
+                services: { academy: 95, studio: 80, training: 50, labs: 30 },
+                impact: 'Organizations at your stage typically see <strong>40-60% efficiency gains</strong> within the first 6 months of proper AI implementation. The key is starting with the right foundation.'
+            },
+            warrior: {
+                name: 'Warrior',
+                class: 'warrior',
+                description: 'You\'ve started your AI journey and have some experience under your belt. Now it\'s time to systematize what works and scale your successes.',
+                recommendation: 'The <strong>Warrior tier</strong> is perfect for you — it combines consulting hours with project delivery. We recommend focusing on <strong>Training</strong> to upskill your team while we build your next <strong>Studio</strong> or <strong>Labs</strong> project.',
+                nextSteps: [
+                    'Audit your current AI implementations for optimization',
+                    'Identify the 3 highest-impact scaling opportunities',
+                    'Train key team members to become AI champions',
+                    'Plan your next major AI initiative with expert guidance'
+                ],
+                services: { training: 90, studio: 85, labs: 75, academy: 60 },
+                impact: 'Companies at your maturity level see <strong>2-3x ROI</strong> when they add structured training and expert guidance. You\'re past the experimentation phase — now it\'s about execution.'
+            },
+            master: {
+                name: 'Master',
+                class: 'master',
+                description: 'You have advanced AI maturity and are ready for enterprise-grade solutions. You need a partner who can match your sophistication and push boundaries.',
+                recommendation: 'The <strong>Master tier</strong> gives you white-glove service with unlimited consulting. Focus on <strong>Labs</strong> for custom development and <strong>Training</strong> programs for your entire organization.',
+                nextSteps: [
+                    'Define your AI center of excellence strategy',
+                    'Plan custom AI agent development for proprietary workflows',
+                    'Implement organization-wide AI governance',
+                    'Explore cutting-edge applications (autonomous systems, etc.)'
+                ],
+                services: { labs: 95, training: 90, studio: 70, academy: 40 },
+                impact: 'At your level, AI becomes a <strong>competitive moat</strong>. Enterprises with mature AI operations outperform competitors by <strong>35% on average</strong>. The question isn\'t if, but how fast.'
+            }
+        };
+
+        // Get stored data
+        const stored = localStorage.getItem('figsamurai_assessment');
+
+        if (stored) {
+            const data = JSON.parse(stored);
+            const score = data.score;
+            const tierKey = data.tier.toLowerCase();
+            const tier = tiers[tierKey];
+
+            // Animate score
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreValue = document.getElementById('scoreValue');
+
+            setTimeout(() => {
+                scoreCircle.style.setProperty('--score', score);
+                let current = 0;
+                const interval = setInterval(() => {
+                    current += 2;
+                    if (current >= score) {
+                        current = score;
+                        clearInterval(interval);
+                    }
+                    scoreValue.textContent = current;
+                }, 20);
+            }, 300);
+
+            // Set tier info
+            document.getElementById('tierName').textContent = tier.name + ' Level';
+            document.getElementById('tierName').className = 'tier-name ' + tier.class;
+            document.getElementById('tierDesc').textContent = tier.description;
+
+            // Set user name
+            if (data.name) {
+                document.getElementById('userName').textContent = `${data.name}, here's where you stand on your AI journey.`;
+            }
+
+            // Set recommendation
+            document.getElementById('recommendationText').innerHTML = tier.recommendation;
+
+            // Set next steps
+            const stepsHtml = tier.nextSteps.map((step, i) =>
+                `<li><span class="step-num">${i + 1}</span> ${step}</li>`
+            ).join('');
+            document.getElementById('nextSteps').innerHTML = stepsHtml;
+
+            // Set services match
+            const servicesHtml = Object.entries(tier.services)
+                .sort((a, b) => b[1] - a[1])
+                .map(([service, percent]) => `
+                    <div class="service-match-item">
+                        <span class="match-label">${service.charAt(0).toUpperCase() + service.slice(1)}</span>
+                        <div class="match-bar">
+                            <div class="match-fill" style="width: ${percent}%"></div>
+                        </div>
+                        <span class="match-percent">${percent}%</span>
+                    </div>
+                `).join('');
+            document.getElementById('servicesMatch').innerHTML = servicesHtml;
+
+            // Set impact
+            document.getElementById('impactText').innerHTML = tier.impact;
+
+        } else {
+            // No data, redirect to assessment
+            window.location.href = 'assessment.html';
+        }
+    </script>
+</body>
+</html>

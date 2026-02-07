@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Readiness Assessment | FigSamurai</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .assessment-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .assessment-header {
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--color-bg-tertiary);
+        }
+
+        .assessment-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .assessment-container {
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--color-bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-bronze);
+            transition: width var(--transition-base);
+            width: 0%;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-sm);
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-bg-tertiary);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            color: var(--color-bronze-light);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        /* Options */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .option:hover {
+            border-color: var(--color-bronze);
+            background: var(--color-bg-tertiary);
+        }
+
+        .option.selected {
+            border-color: var(--color-bronze-light);
+            background: rgba(139, 115, 85, 0.15);
+        }
+
+        .option-radio {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--color-text-muted);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .option.selected .option-radio {
+            border-color: var(--color-bronze-light);
+        }
+
+        .option.selected .option-radio::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--color-bronze-light);
+            border-radius: 50%;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-label {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .option-desc {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Navigation */
+        .question-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-xl);
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--color-text-secondary);
+            border: none;
+            padding: 0;
+        }
+
+        .btn-back:hover {
+            color: var(--color-text-primary);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Email Form */
+        .email-form {
+            display: none;
+        }
+
+        .email-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .email-form h2 {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .email-form > p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: var(--spacing-md);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            transition: border-color var(--transition-fast);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-bronze);
+        }
+
+        .form-group input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        /* Results Preview */
+        .results-preview {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .results-preview h3 {
+            margin-bottom: var(--spacing-md);
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+        }
+
+        .score-preview {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-bronze);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .score-details {
+            flex: 1;
+        }
+
+        .score-label {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .score-desc {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        .results-teaser {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--color-bg-tertiary);
+        }
+
+        .teaser-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        .teaser-item .lock {
+            color: var(--color-bronze-light);
+        }
+
+        .privacy-note {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: var(--spacing-sm);
+        }
+    </style>
+</head>
+<body class="assessment-page">
+    <!-- Header -->
+    <header class="assessment-header">
+        <div class="container">
+            <a href="/" class="logo">
+                <svg class="logo-icon" width="32" height="32" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+                    <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                </svg>
+                <span class="logo-text">Fig<span class="logo-highlight">Samurai</span></span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="assessment-main">
+        <div class="container">
+            <div class="assessment-container">
+                <!-- Progress -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressStep">Question 1 of 5</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+
+                <!-- Question 1 -->
+                <div class="question-card active" data-question="1">
+                    <div class="question-number">Question 1</div>
+                    <h2 class="question-text">What industry is your organization in?</h2>
+                    <div class="options-grid">
+                        <div class="option" data-value="finance" data-points="25">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Financial Services</div>
+                                <div class="option-desc">Banking, Insurance, Fintech, Investments</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="media" data-points="20">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Media & Publishing</div>
+                                <div class="option-desc">News, Content, Digital Media, Entertainment</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="tech" data-points="22">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Technology</div>
+                                <div class="option-desc">SaaS, Software, IT Services, Startups</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="other" data-points="15">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Other Industry</div>
+                                <div class="option-desc">Retail, Healthcare, Manufacturing, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-nav">
+                        <div></div>
+                        <button class="btn btn-primary btn-next" disabled>Next</button>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-card" data-question="2">
+                    <div class="question-number">Question 2</div>
+                    <h2 class="question-text">How is your organization currently using AI?</h2>
+                    <div class="options-grid">
+                        <div class="option" data-value="none" data-points="5">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Not using AI yet</div>
+                                <div class="option-desc">We haven't started exploring AI applications</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="exploring" data-points="12">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Exploring & Experimenting</div>
+                                <div class="option-desc">Trying out tools like ChatGPT, running pilots</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="production" data-points="20">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">In Production</div>
+                                <div class="option-desc">We have AI systems running in our workflows</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="advanced" data-points="25">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Advanced Implementation</div>
+                                <div class="option-desc">Multiple AI systems, custom models, AI team</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-nav">
+                        <button class="btn btn-back">&larr; Back</button>
+                        <button class="btn btn-primary btn-next" disabled>Next</button>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question-card" data-question="3">
+                    <div class="question-number">Question 3</div>
+                    <h2 class="question-text">What's your biggest AI challenge right now?</h2>
+                    <div class="options-grid">
+                        <div class="option" data-value="start" data-points="10">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Don't know where to start</div>
+                                <div class="option-desc">Overwhelmed by options, need guidance</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="integration" data-points="18">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Integration with existing systems</div>
+                                <div class="option-desc">Technical challenges connecting AI to our stack</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="training" data-points="15">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Training our team</div>
+                                <div class="option-desc">People don't know how to use AI effectively</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="scaling" data-points="22">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Scaling what works</div>
+                                <div class="option-desc">Pilots successful, need help expanding</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-nav">
+                        <button class="btn btn-back">&larr; Back</button>
+                        <button class="btn btn-primary btn-next" disabled>Next</button>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question-card" data-question="4">
+                    <div class="question-number">Question 4</div>
+                    <h2 class="question-text">What's your team size?</h2>
+                    <div class="options-grid">
+                        <div class="option" data-value="solo" data-points="8">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Solo / Freelancer</div>
+                                <div class="option-desc">Just me</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="small" data-points="12">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Small Team (2-10)</div>
+                                <div class="option-desc">Startup or small business</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="medium" data-points="18">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Medium (11-50)</div>
+                                <div class="option-desc">Growing company with departments</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="enterprise" data-points="25">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Enterprise (50+)</div>
+                                <div class="option-desc">Large organization with multiple teams</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-nav">
+                        <button class="btn btn-back">&larr; Back</button>
+                        <button class="btn btn-primary btn-next" disabled>Next</button>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="question-card" data-question="5">
+                    <div class="question-number">Question 5</div>
+                    <h2 class="question-text">What's your AI investment budget?</h2>
+                    <div class="options-grid">
+                        <div class="option" data-value="starter" data-points="8">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">Under $1,000/month</div>
+                                <div class="option-desc">Looking for affordable solutions</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="growth" data-points="15">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">$1,000 - $5,000/month</div>
+                                <div class="option-desc">Ready to invest in growth</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="scale" data-points="20">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">$5,000 - $20,000/month</div>
+                                <div class="option-desc">Serious about AI transformation</div>
+                            </div>
+                        </div>
+                        <div class="option" data-value="enterprise" data-points="25">
+                            <div class="option-radio"></div>
+                            <div class="option-content">
+                                <div class="option-label">$20,000+/month</div>
+                                <div class="option-desc">Enterprise-level investment</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-nav">
+                        <button class="btn btn-back">&larr; Back</button>
+                        <button class="btn btn-primary btn-next" disabled>See My Results</button>
+                    </div>
+                </div>
+
+                <!-- Email Form -->
+                <div class="email-form" id="emailForm">
+                    <h2>Your AI Readiness Score is Ready!</h2>
+                    <p>Enter your email to see your personalized results and recommendations.</p>
+
+                    <div class="results-preview">
+                        <h3>Your Preview</h3>
+                        <div class="score-preview">
+                            <div class="score-circle" id="scorePreview">--</div>
+                            <div class="score-details">
+                                <div class="score-label" id="tierPreview">Calculating...</div>
+                                <div class="score-desc">AI Readiness Level</div>
+                            </div>
+                        </div>
+                        <div class="results-teaser">
+                            <div class="teaser-item"><span class="lock">&#128274;</span> Personalized recommendations</div>
+                            <div class="teaser-item"><span class="lock">&#128274;</span> Recommended service tier</div>
+                            <div class="teaser-item"><span class="lock">&#128274;</span> Next steps roadmap</div>
+                        </div>
+                    </div>
+
+                    <form id="resultsForm" action="https://formspree.io/f/mqedkpkz" method="POST">
+                        <input type="hidden" name="score" id="hiddenScore">
+                        <input type="hidden" name="tier" id="hiddenTier">
+                        <input type="hidden" name="answers" id="hiddenAnswers">
+
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" placeholder="John Smith" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="john@company.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company (Optional)</label>
+                            <input type="text" id="company" name="company" placeholder="Acme Corp">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large btn-block">Unlock My Full Results</button>
+                        <p class="privacy-note">We respect your privacy. No spam, just helpful AI insights.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/assessment.js"></script>
+</body>
+</html>

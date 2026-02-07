@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FigSamurai - Logo Options</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --fig-deep: #1A1A1A;
+            --fig-charcoal: #2D2D2D;
+            --fig-warm: #8B7355;
+            --fig-bronze: #A67C52;
+            --fig-cream: #F5F2ED;
+            --samurai-red: #C41E3A;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--fig-cream);
+            color: var(--fig-charcoal);
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            color: var(--fig-deep);
+        }
+
+        .intro {
+            text-align: center;
+            color: var(--fig-warm);
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto 60px;
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .option-header {
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--fig-cream);
+        }
+
+        .option-number {
+            display: inline-block;
+            background: var(--fig-bronze);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 15px;
+        }
+
+        .option-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--fig-deep);
+            margin-bottom: 8px;
+        }
+
+        .option-header p {
+            color: var(--fig-warm);
+            font-size: 0.9rem;
+        }
+
+        .logo-variants {
+            padding: 30px;
+        }
+
+        .variant {
+            margin-bottom: 30px;
+        }
+
+        .variant:last-child {
+            margin-bottom: 0;
+        }
+
+        .variant-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--fig-warm);
+            margin-bottom: 15px;
+        }
+
+        .variant-display {
+            border-radius: 12px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+        }
+
+        .variant-display.light {
+            background: white;
+            border: 1px solid var(--fig-cream);
+        }
+
+        .variant-display.dark {
+            background: var(--fig-deep);
+        }
+
+        .variant-display.cream {
+            background: var(--fig-cream);
+        }
+
+        .logo-combo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-stacked {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wordmark {
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+        }
+
+        .wordmark.dark {
+            color: var(--fig-deep);
+        }
+
+        .wordmark.light {
+            color: white;
+        }
+
+        .wordmark .fig {
+            color: var(--fig-deep);
+        }
+
+        .wordmark .samurai {
+            color: var(--fig-bronze);
+        }
+
+        .wordmark.light .fig,
+        .wordmark.light .samurai {
+            color: white;
+        }
+
+        .wordmark.light .samurai {
+            opacity: 0.7;
+        }
+
+        .option-footer {
+            padding: 25px 30px;
+            background: var(--fig-cream);
+        }
+
+        .option-footer h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--fig-warm);
+            margin-bottom: 10px;
+        }
+
+        .option-footer p {
+            font-size: 0.9rem;
+            color: var(--fig-charcoal);
+            line-height: 1.6;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .comparison-section h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: var(--fig-deep);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .comparison-item {
+            text-align: center;
+            padding: 30px;
+            background: var(--fig-cream);
+            border-radius: 12px;
+        }
+
+        .comparison-item h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--fig-deep);
+            margin-bottom: 15px;
+        }
+
+        .comparison-logo {
+            background: var(--fig-deep);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comparison-item p {
+            font-size: 0.85rem;
+            color: var(--fig-warm);
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: var(--samurai-red);
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .options-grid,
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>FigSamurai Logo Options</h1>
+    <p class="intro">Three distinct approaches for the FigSamurai brand identity. All use the Warm Earth color palette (Charcoal, Bronze, Samurai Red).</p>
+
+    <div class="options-grid">
+
+        <!-- OPTION 1: Fig Leaf (Original) -->
+        <div class="option-card">
+            <div class="option-header">
+                <div class="option-number">OPTION 1</div>
+                <h2>Fig Leaf</h2>
+                <p>The original concept — organic & symbolic</p>
+            </div>
+            <div class="logo-variants">
+                <div class="variant">
+                    <div class="variant-label">Primary (Light Background)</div>
+                    <div class="variant-display light">
+                        <div class="logo-stacked">
+                            <svg width="70" height="70" viewBox="0 0 100 100" fill="none">
+                                <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="#1A1A1A"/>
+                                <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.4"/>
+                                <path d="M50 30C40 40 35 55 38 70" stroke="#A67C52" stroke-width="1.5" opacity="0.3"/>
+                                <path d="M50 30C60 40 65 55 62 70" stroke="#A67C52" stroke-width="1.5" opacity="0.3"/>
+                                <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                            </svg>
+                            <div class="wordmark"><span class="fig">Fig</span><span class="samurai">Samurai</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="variant">
+                    <div class="variant-label">Reversed (Dark Background)</div>
+                    <div class="variant-display dark">
+                        <div class="logo-stacked">
+                            <svg width="70" height="70" viewBox="0 0 100 100" fill="none">
+                                <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+                                <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.3"/>
+                                <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                            </svg>
+                            <div class="wordmark light">FigSamurai</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="variant">
+                    <div class="variant-label">Icon Only</div>
+                    <div class="variant-display cream">
+                        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                            <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="#1A1A1A"/>
+                            <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.4"/>
+                            <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="option-footer">
+                <h4>Best For</h4>
+                <p>Organic, botanical feel that connects to "fig." The red dot adds a samurai accent. <span class="highlight">Most unique and memorable.</span></p>
+            </div>
+        </div>
+
+        <!-- OPTION 2: Katana Blade -->
+        <div class="option-card">
+            <div class="option-header">
+                <div class="option-number">OPTION 2</div>
+                <h2>Katana Blade</h2>
+                <p>Sharp, precise, warrior spirit</p>
+            </div>
+            <div class="logo-variants">
+                <div class="variant">
+                    <div class="variant-label">Primary (Light Background)</div>
+                    <div class="variant-display light">
+                        <div class="logo-combo">
+                            <svg width="50" height="70" viewBox="0 0 50 100" fill="none">
+                                <!-- Katana blade shape -->
+                                <path d="M25 5L35 15L35 85L25 95L15 85L15 15L25 5Z" fill="#1A1A1A"/>
+                                <!-- Blade highlight -->
+                                <path d="M25 10L30 18L30 80L25 88" stroke="#A67C52" stroke-width="1.5" opacity="0.5"/>
+                                <!-- Tsuba (guard) -->
+                                <ellipse cx="25" cy="75" rx="15" ry="4" fill="#2D2D2D"/>
+                                <!-- Red accent at tip -->
+                                <circle cx="25" cy="12" r="3" fill="#C41E3A"/>
+                            </svg>
+                            <div class="wordmark"><span class="fig">Fig</span><span class="samurai">Samurai</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="variant">
+                    <div class="variant-label">Reversed (Dark Background)</div>
+                    <div class="variant-display dark">
+                        <div class="logo-combo">
+                            <svg width="50" height="70" viewBox="0 0 50 100" fill="none">
+                                <path d="M25 5L35 15L35 85L25 95L15 85L15 15L25 5Z" fill="white"/>
+                                <path d="M25 10L30 18L30 80L25 88" stroke="#A67C52" stroke-width="1.5" opacity="0.4"/>
+                                <ellipse cx="25" cy="75" rx="15" ry="4" fill="rgba(255,255,255,0.3)"/>
+                                <circle cx="25" cy="12" r="3" fill="#C41E3A"/>
+                            </svg>
+                            <div class="wordmark light">FigSamurai</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="variant">
+                    <div class="variant-label">Icon Only</div>
+                    <div class="variant-display cream">
+                        <svg width="60" height="90" viewBox="0 0 50 100" fill="none">
+                            <path d="M25 5L35 15L35 85L25 95L15 85L15 15L25 5Z" fill="#1A1A1A"/>
+                            <path d="M25 10L30 18L30 80L25 88" stroke="#A67C52" stroke-width="1.5" opacity="0.5"/>
+                            <ellipse cx="25" cy="75" rx="15" ry="4" fill="#2D2D2D"/>
+                            <circle cx="25" cy="12" r="3" fill="#C41E3A"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="option-footer">
+                <h4>Best For</h4>
+                <p>Emphasizes precision and the samurai warrior spirit. Clean, modern, geometric. <span class="highlight">Most corporate-friendly.</span></p>
+            </div>
+        </div>
+
+        <!-- OPTION 3: Minimal Mark -->
+        <div class="option-card">
+            <div class="option-header">
+                <div class="option-number">OPTION 3</div>
+                <h2>Minimal Mark</h2>
+                <p>Abstract, modern, versatile</p>
+            </div>
+            <div class="logo-variants">
+                <div class="variant">
+                    <div class="variant-label">Primary (Light Background)</div>
+                    <div class="variant-display light">
+                        <div class="logo-combo">
+                            <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                                <!-- Abstract F + S combination -->
+                                <rect x="15" y="15" width="70" height="70" rx="8" fill="#1A1A1A"/>
+                                <!-- F letterform abstracted -->
+                                <path d="M30 30H50V38H38V45H48V53H38V70H30V30Z" fill="white"/>
+                                <!-- S curve -->
+                                <path d="M55 35C55 35 75 35 75 48C75 55 65 55 65 55C65 55 75 55 75 68C75 75 55 75 55 75" stroke="#A67C52" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <!-- Red dot -->
+                                <circle cx="75" cy="30" r="5" fill="#C41E3A"/>
+                            </svg>
+                            <div class="wordmark"><span class="fig">Fig</span><span class="samurai">Samurai</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="variant">
+                    <div class="variant-label">Reversed (Dark Background)</div>
+                    <div class="variant-display dark">
+                        <div class="logo-combo">
+                            <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                                <rect x="15" y="15" width="70" height="70" rx="8" fill="white"/>
+                                <path d="M30 30H50V38H38V45H48V53H38V70H30V30Z" fill="#1A1A1A"/>
+                                <path d="M55 35C55 35 75 35 75 48C75 55 65 55 65 55C65 55 75 55 75 68C75 75 55 75 55 75" stroke="#A67C52" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                <circle cx="75" cy="30" r="5" fill="#C41E3A"/>
+                            </svg>
+                            <div class="wordmark light">FigSamurai</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="variant">
+                    <div class="variant-label">Icon Only</div>
+                    <div class="variant-display cream">
+                        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                            <rect x="15" y="15" width="70" height="70" rx="8" fill="#1A1A1A"/>
+                            <path d="M30 30H50V38H38V45H48V53H38V70H30V30Z" fill="white"/>
+                            <path d="M55 35C55 35 75 35 75 48C75 55 65 55 65 55C65 55 75 55 75 68C75 75 55 75 55 75" stroke="#A67C52" stroke-width="4" stroke-linecap="round" fill="none"/>
+                            <circle cx="75" cy="30" r="5" fill="#C41E3A"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="option-footer">
+                <h4>Best For</h4>
+                <p>Tech-forward, works great as an app icon or favicon. Subtle "FS" letterforms. <span class="highlight">Most scalable at small sizes.</span></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Side by Side Comparison -->
+    <div class="comparison-section">
+        <h2>Quick Comparison</h2>
+        <div class="comparison-grid">
+            <div class="comparison-item">
+                <h3>Option 1: Fig Leaf</h3>
+                <div class="comparison-logo">
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                        <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+                        <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.3"/>
+                        <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                    </svg>
+                </div>
+                <p>Organic, unique, connects to brand name. <strong>Most memorable.</strong></p>
+            </div>
+            <div class="comparison-item">
+                <h3>Option 2: Katana</h3>
+                <div class="comparison-logo">
+                    <svg width="40" height="60" viewBox="0 0 50 100" fill="none">
+                        <path d="M25 5L35 15L35 85L25 95L15 85L15 15L25 5Z" fill="white"/>
+                        <ellipse cx="25" cy="75" rx="15" ry="4" fill="rgba(255,255,255,0.3)"/>
+                        <circle cx="25" cy="12" r="3" fill="#C41E3A"/>
+                    </svg>
+                </div>
+                <p>Sharp, precise, warrior spirit. <strong>Most corporate.</strong></p>
+            </div>
+            <div class="comparison-item">
+                <h3>Option 3: Minimal</h3>
+                <div class="comparison-logo">
+                    <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                        <rect x="15" y="15" width="70" height="70" rx="8" fill="white"/>
+                        <path d="M30 30H50V38H38V45H48V53H38V70H30V30Z" fill="#1A1A1A"/>
+                        <path d="M55 35C55 35 75 35 75 48C75 55 65 55 65 55C65 55 75 55 75 68C75 75 55 75 55 75" stroke="#A67C52" stroke-width="4" stroke-linecap="round" fill="none"/>
+                        <circle cx="75" cy="30" r="5" fill="#C41E3A"/>
+                    </svg>
+                </div>
+                <p>Tech-forward, abstract FS. <strong>Most scalable.</strong></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

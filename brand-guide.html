@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FigSamurai Brand Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .page-break { page-break-before: always; }
+            .no-print { display: none; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --fig-deep: #1A1A1A;
+            --fig-charcoal: #2D2D2D;
+            --fig-warm: #8B7355;
+            --fig-bronze: #A67C52;
+            --fig-cream: #F5F2ED;
+            --fig-sand: #E8E4DD;
+            --samurai-red: #C41E3A;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            background: white;
+            line-height: 1.6;
+        }
+
+        /* Cover Page */
+        .cover {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--fig-deep) 0%, var(--fig-charcoal) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            color: white;
+        }
+
+        .cover-logo {
+            margin-bottom: 40px;
+        }
+
+        .cover h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .cover h1 span {
+            color: var(--fig-bronze);
+        }
+
+        .cover .tagline {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-bottom: 60px;
+        }
+
+        .cover .doc-title {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .cover .doc-version {
+            font-size: 0.875rem;
+            opacity: 0.4;
+        }
+
+        /* Section Pages */
+        .section {
+            padding: 80px 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--fig-bronze);
+            margin-bottom: 10px;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--fig-deep);
+            margin-bottom: 15px;
+        }
+
+        .section-intro {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* Brand Overview */
+        .brand-essence {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .essence-item {
+            padding: 30px;
+            background: var(--fig-cream);
+            border-radius: 12px;
+        }
+
+        .essence-item h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--fig-warm);
+            margin-bottom: 10px;
+        }
+
+        .essence-item p {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--fig-deep);
+        }
+
+        .brand-story {
+            background: var(--fig-deep);
+            color: white;
+            padding: 50px;
+            border-radius: 16px;
+        }
+
+        .brand-story h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .brand-story p {
+            font-size: 1rem;
+            line-height: 1.8;
+            opacity: 0.85;
+        }
+
+        /* Logo Section */
+        .logo-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .logo-card {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .logo-card-header {
+            padding: 15px 25px;
+            background: var(--fig-cream);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--fig-warm);
+        }
+
+        .logo-card-display {
+            padding: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .logo-card-display.light {
+            background: white;
+            border: 1px solid var(--fig-sand);
+        }
+
+        .logo-card-display.dark {
+            background: var(--fig-deep);
+        }
+
+        .logo-card-display.cream {
+            background: var(--fig-cream);
+        }
+
+        .logo-combo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .wordmark {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+        }
+
+        .wordmark.dark {
+            color: var(--fig-deep);
+        }
+
+        .wordmark.dark span {
+            color: var(--fig-bronze);
+        }
+
+        .wordmark.light {
+            color: white;
+        }
+
+        /* Logo Rules */
+        .logo-rules {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .rule-card {
+            padding: 25px;
+            background: var(--fig-cream);
+            border-radius: 12px;
+        }
+
+        .rule-card.dont {
+            background: #FFF5F5;
+            border: 1px solid #FFCCCC;
+        }
+
+        .rule-card h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rule-card h4 .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .rule-card h4 .icon.do {
+            background: #28a745;
+            color: white;
+        }
+
+        .rule-card h4 .icon.dont {
+            background: #dc3545;
+            color: white;
+        }
+
+        .rule-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Color Palette */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .color-swatch {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch-display {
+            height: 120px;
+        }
+
+        .color-swatch-info {
+            padding: 15px;
+            background: white;
+        }
+
+        .color-swatch-name {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 5px;
+        }
+
+        .color-swatch-values {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .color-usage {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .usage-card {
+            padding: 25px;
+            background: var(--fig-cream);
+            border-radius: 12px;
+        }
+
+        .usage-card h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--fig-deep);
+        }
+
+        .usage-card ul {
+            list-style: none;
+        }
+
+        .usage-card li {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .usage-card li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .usage-card.primary li::before { background: var(--fig-deep); }
+        .usage-card.accent li::before { background: var(--fig-bronze); }
+        .usage-card.highlight li::before { background: var(--samurai-red); }
+        .usage-card.neutral li::before { background: var(--fig-cream); border: 1px solid #ddd; }
+
+        /* Typography */
+        .type-specimen {
+            margin-bottom: 50px;
+        }
+
+        .type-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--fig-bronze);
+            margin-bottom: 20px;
+        }
+
+        .type-display {
+            background: var(--fig-cream);
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .type-display.dark {
+            background: var(--fig-deep);
+            color: white;
+        }
+
+        .type-alphabet {
+            font-size: 2rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 15px;
+        }
+
+        .type-weights {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .type-weight {
+            font-size: 1.5rem;
+        }
+
+        .type-weight span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .type-scale {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .scale-item {
+            display: flex;
+            align-items: baseline;
+            gap: 30px;
+        }
+
+        .scale-label {
+            width: 100px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .scale-h1 { font-size: 3rem; font-weight: 800; }
+        .scale-h2 { font-size: 2.5rem; font-weight: 700; }
+        .scale-h3 { font-size: 1.5rem; font-weight: 700; }
+        .scale-body { font-size: 1rem; }
+        .scale-small { font-size: 0.875rem; color: var(--text-secondary); }
+
+        /* Business Lines */
+        .business-lines {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .business-card {
+            background: var(--fig-cream);
+            border-radius: 16px;
+            padding: 35px;
+        }
+
+        .business-card.featured {
+            background: var(--fig-deep);
+            color: white;
+        }
+
+        .business-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--fig-deep);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .business-card.featured .business-icon {
+            background: var(--fig-bronze);
+        }
+
+        .business-card h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .business-card .tagline {
+            font-size: 0.875rem;
+            color: var(--fig-bronze);
+            margin-bottom: 15px;
+        }
+
+        .business-card.featured .tagline {
+            color: var(--fig-cream);
+        }
+
+        .business-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .business-card.featured p {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Pricing Tiers */
+        .pricing-tiers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .tier-card {
+            background: var(--fig-cream);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .tier-card.featured {
+            background: var(--fig-deep);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .tier-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .tier-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--fig-bronze);
+            margin-bottom: 5px;
+        }
+
+        .tier-card.featured .tier-price {
+            color: white;
+        }
+
+        .tier-period {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .tier-card.featured .tier-period {
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Voice & Tone */
+        .voice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .voice-card {
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .voice-card.do {
+            background: #F0FFF4;
+            border: 1px solid #9AE6B4;
+        }
+
+        .voice-card.dont {
+            background: #FFF5F5;
+            border: 1px solid #FEB2B2;
+        }
+
+        .voice-card h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .voice-card blockquote {
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            padding-left: 15px;
+            border-left: 3px solid currentColor;
+        }
+
+        .voice-card.do blockquote {
+            border-color: #38A169;
+        }
+
+        .voice-card.dont blockquote {
+            border-color: #E53E3E;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .contact-card {
+            background: var(--fig-cream);
+            padding: 35px;
+            border-radius: 16px;
+        }
+
+        .contact-card h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--fig-warm);
+            margin-bottom: 15px;
+        }
+
+        .contact-card p {
+            font-size: 1.125rem;
+            color: var(--fig-deep);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .guide-footer {
+            background: var(--fig-deep);
+            color: white;
+            padding: 40px 60px;
+            text-align: center;
+        }
+
+        .guide-footer p {
+            font-size: 0.875rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cover Page -->
+    <div class="cover">
+        <div class="cover-logo">
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
+                <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+                <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.3"/>
+                <path d="M50 30C40 40 35 55 38 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+                <path d="M50 30C60 40 65 55 62 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+                <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
+            </svg>
+        </div>
+        <h1>Fig<span>Samurai</span></h1>
+        <p class="tagline">Master Your AI</p>
+        <p class="doc-title">Brand Guidelines</p>
+        <p class="doc-version">Version 1.0 — February 2025</p>
+    </div>
+
+    <!-- Section 1: Brand Overview -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 01</div>
+            <h2>Brand Overview</h2>
+            <p class="section-intro">FigSamurai is an AI services company that brings the discipline of master craftsmen to artificial intelligence implementation.</p>
+        </div>
+
+        <div class="brand-essence">
+            <div class="essence-item">
+                <h4>Brand Name</h4>
+                <p>FigSamurai</p>
+            </div>
+            <div class="essence-item">
+                <h4>Tagline</h4>
+                <p>Master Your AI</p>
+            </div>
+            <div class="essence-item">
+                <h4>Domain</h4>
+                <p>figsamurai.com / .ai</p>
+            </div>
+        </div>
+
+        <div class="brand-story">
+            <h3>Brand Story</h3>
+            <p>The name FigSamurai combines two powerful elements: the fig — a symbol of wisdom, prosperity, and hidden knowledge — with the samurai, representing discipline, precision, and mastery. Together, they embody our approach to AI: we cultivate deep expertise (the fig) and apply it with unwavering precision (the samurai) to help organizations master artificial intelligence.</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Logo -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 02</div>
+            <h2>Logo</h2>
+            <p class="section-intro">The FigSamurai logo features an organic fig leaf shape with a red samurai accent dot, representing the fusion of natural wisdom and warrior precision.</p>
+        </div>
+
+        <div class="logo-display">
+            <div class="logo-card">
+                <div class="logo-card-header">Primary Logo — Light Background</div>
+                <div class="logo-card-display light">
+                    <div class="logo-combo">
+                        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                            <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="#1A1A1A"/>
+                            <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.4"/>
+                            <path d="M50 30C40 40 35 55 38 70" stroke="#A67C52" stroke-width="1.5" opacity="0.3"/>
+                            <path d="M50 30C60 40 65 55 62 70" stroke="#A67C52" stroke-width="1.5" opacity="0.3"/>
+                            <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                        </svg>
+                        <div class="wordmark dark">Fig<span>Samurai</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logo-card">
+                <div class="logo-card-header">Primary Logo — Dark Background</div>
+                <div class="logo-card-display dark">
+                    <div class="logo-combo">
+                        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                            <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+                            <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.3"/>
+                            <path d="M50 30C40 40 35 55 38 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+                            <path d="M50 30C60 40 65 55 62 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+                            <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                        </svg>
+                        <div class="wordmark light">FigSamurai</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logo-card">
+                <div class="logo-card-header">Icon Mark — For Small Applications</div>
+                <div class="logo-card-display cream">
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                        <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="#1A1A1A"/>
+                        <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="logo-card">
+                <div class="logo-card-header">Icon Mark — Reversed</div>
+                <div class="logo-card-display dark">
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                        <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+                        <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 20px;">Logo Usage Rules</h3>
+        <div class="logo-rules">
+            <div class="rule-card">
+                <h4><span class="icon do">✓</span> Do</h4>
+                <p>Use the full logo with veins for headers and large applications. Use the simplified icon mark for favicons and small sizes.</p>
+            </div>
+            <div class="rule-card">
+                <h4><span class="icon do">✓</span> Do</h4>
+                <p>Maintain minimum clear space around the logo equal to the height of the red dot.</p>
+            </div>
+            <div class="rule-card dont">
+                <h4><span class="icon dont">✗</span> Don't</h4>
+                <p>Never stretch, rotate, or distort the logo. Never change the colors of individual elements.</p>
+            </div>
+            <div class="rule-card dont">
+                <h4><span class="icon dont">✗</span> Don't</h4>
+                <p>Never place the logo on busy backgrounds or low-contrast surfaces.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Color Palette -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 03</div>
+            <h2>Color Palette</h2>
+            <p class="section-intro">The Warm Earth palette conveys sophistication, timelessness, and premium quality. The red accent adds energy and connects to the samurai spirit.</p>
+        </div>
+
+        <div class="color-grid">
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #1A1A1A;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Deep Black</div>
+                    <div class="color-swatch-values">#1A1A1A<br>RGB 26, 26, 26</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #2D2D2D;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Charcoal</div>
+                    <div class="color-swatch-values">#2D2D2D<br>RGB 45, 45, 45</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #8B7355;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Warm Brown</div>
+                    <div class="color-swatch-values">#8B7355<br>RGB 139, 115, 85</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #A67C52;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Bronze</div>
+                    <div class="color-swatch-values">#A67C52<br>RGB 166, 124, 82</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #C41E3A;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Samurai Red</div>
+                    <div class="color-swatch-values">#C41E3A<br>RGB 196, 30, 58</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #F5F2ED; border: 1px solid #E8E4DD;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Cream</div>
+                    <div class="color-swatch-values">#F5F2ED<br>RGB 245, 242, 237</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #E8E4DD;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">Sand</div>
+                    <div class="color-swatch-values">#E8E4DD<br>RGB 232, 228, 221</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-swatch-display" style="background: #FFFFFF; border: 1px solid #E8E4DD;"></div>
+                <div class="color-swatch-info">
+                    <div class="color-swatch-name">White</div>
+                    <div class="color-swatch-values">#FFFFFF<br>RGB 255, 255, 255</div>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin: 40px 0 20px;">Color Usage</h3>
+        <div class="color-usage">
+            <div class="usage-card primary">
+                <h4>Primary Colors</h4>
+                <ul>
+                    <li>Deep Black for text and primary UI</li>
+                    <li>Charcoal for secondary elements</li>
+                    <li>Dark backgrounds and headers</li>
+                </ul>
+            </div>
+            <div class="usage-card accent">
+                <h4>Accent Colors</h4>
+                <ul>
+                    <li>Bronze for highlights and CTAs</li>
+                    <li>Warm Brown for subtle accents</li>
+                    <li>Links and interactive elements</li>
+                </ul>
+            </div>
+            <div class="usage-card highlight">
+                <h4>Highlight Color</h4>
+                <ul>
+                    <li>Samurai Red for emphasis only</li>
+                    <li>Logo accent dot</li>
+                    <li>Badges and alerts</li>
+                </ul>
+            </div>
+            <div class="usage-card neutral">
+                <h4>Neutral Colors</h4>
+                <ul>
+                    <li>Cream for backgrounds</li>
+                    <li>Sand for cards and sections</li>
+                    <li>White for content areas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4: Typography -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 04</div>
+            <h2>Typography</h2>
+            <p class="section-intro">Inter is our primary typeface, chosen for its excellent legibility, modern aesthetic, and extensive weight range.</p>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-name">Primary Typeface — Inter</div>
+            <div class="type-display">
+                <div class="type-alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+                <div class="type-alphabet" style="font-size: 1.5rem;">abcdefghijklmnopqrstuvwxyz</div>
+                <div class="type-alphabet" style="font-size: 1.5rem;">0123456789 !@#$%^&*()</div>
+            </div>
+            <div class="type-weights">
+                <div class="type-weight" style="font-weight: 300;">Light<span>300</span></div>
+                <div class="type-weight" style="font-weight: 400;">Regular<span>400</span></div>
+                <div class="type-weight" style="font-weight: 500;">Medium<span>500</span></div>
+                <div class="type-weight" style="font-weight: 600;">SemiBold<span>600</span></div>
+                <div class="type-weight" style="font-weight: 700;">Bold<span>700</span></div>
+                <div class="type-weight" style="font-weight: 800;">ExtraBold<span>800</span></div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 20px;">Type Scale</h3>
+        <div class="type-display dark">
+            <div class="type-scale">
+                <div class="scale-item">
+                    <span class="scale-label">H1 / 48px / 800</span>
+                    <span class="scale-h1">Master Your AI</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-label">H2 / 40px / 700</span>
+                    <span class="scale-h2">Four Ways to Master</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-label">H3 / 24px / 700</span>
+                    <span class="scale-h3">FigSamurai Studio</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-label">Body / 16px / 400</span>
+                    <span class="scale-body">We bring the discipline of master craftsmen to AI.</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-label">Small / 14px / 400</span>
+                    <span class="scale-small">© 2025 FigSamurai. All rights reserved.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 5: Business Lines -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 05</div>
+            <h2>Business Lines</h2>
+            <p class="section-intro">FigSamurai operates as an umbrella brand with four specialized service lines, each targeting different market needs.</p>
+        </div>
+
+        <div class="business-lines">
+            <div class="business-card">
+                <div class="business-icon">🖥️</div>
+                <h4>FigSamurai Studio</h4>
+                <div class="tagline">Done-for-you AI platforms</div>
+                <p>We build and deploy complete AI-powered content platforms, news sites, and automation systems — ready to run. Perfect for media companies, publishers, and enterprises wanting quick AI wins.</p>
+            </div>
+
+            <div class="business-card featured">
+                <div class="business-icon">🎓</div>
+                <h4>FigSamurai Training</h4>
+                <div class="tagline">AI training for enterprises</div>
+                <p>Comprehensive AI literacy and ethics programs designed for financial institutions, banks, and regulated industries. Our premium offering with the highest contract values.</p>
+            </div>
+
+            <div class="business-card">
+                <div class="business-icon">🔧</div>
+                <h4>FigSamurai Labs</h4>
+                <div class="tagline">Custom AI development</div>
+                <p>Bespoke AI agents, workflow automation, and integrations built specifically for your organization's needs. For companies with unique requirements.</p>
+            </div>
+
+            <div class="business-card">
+                <div class="business-icon">📚</div>
+                <h4>FigSamurai Academy</h4>
+                <div class="tagline">Self-paced learning</div>
+                <p>Online courses, certifications, and resources for individuals and teams who want to learn AI at their own pace. Scalable, recurring revenue model.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Pricing Tiers -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 06</div>
+            <h2>Pricing Tiers</h2>
+            <p class="section-intro">Three tiers named after the martial arts journey: Apprentice, Warrior, and Master.</p>
+        </div>
+
+        <div class="pricing-tiers">
+            <div class="tier-card">
+                <div class="tier-name">Apprentice</div>
+                <div class="tier-price">$497</div>
+                <div class="tier-period">per month</div>
+                <p style="margin-top: 20px; font-size: 0.875rem; color: var(--text-secondary);">For individuals and small teams beginning their AI journey.</p>
+            </div>
+
+            <div class="tier-card featured">
+                <div class="tier-name">Warrior</div>
+                <div class="tier-price">$4,997</div>
+                <div class="tier-period">per month</div>
+                <p style="margin-top: 20px; font-size: 0.875rem; color: rgba(255,255,255,0.6);">For growing companies ready to scale their AI capabilities.</p>
+            </div>
+
+            <div class="tier-card">
+                <div class="tier-name">Master</div>
+                <div class="tier-price">$25,000+</div>
+                <div class="tier-period">per month</div>
+                <p style="margin-top: 20px; font-size: 0.875rem; color: var(--text-secondary);">For enterprises requiring white-glove service and custom solutions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 7: Voice & Tone -->
+    <div class="section page-break">
+        <div class="section-header">
+            <div class="section-number">Section 07</div>
+            <h2>Voice & Tone</h2>
+            <p class="section-intro">FigSamurai communicates with confident expertise, respect for the craft, and accessible clarity.</p>
+        </div>
+
+        <div class="brand-essence" style="margin-bottom: 40px;">
+            <div class="essence-item">
+                <h4>We Are</h4>
+                <p>Confident, Expert, Precise</p>
+            </div>
+            <div class="essence-item">
+                <h4>We Sound</h4>
+                <p>Clear, Knowledgeable, Approachable</p>
+            </div>
+            <div class="essence-item">
+                <h4>We Never</h4>
+                <p>Hype, Oversell, Confuse</p>
+            </div>
+        </div>
+
+        <div class="voice-grid">
+            <div class="voice-card do">
+                <h4><span style="color: #38A169;">✓</span> Do Write</h4>
+                <blockquote>"We build AI systems that work. No hype, just results that matter to your bottom line."</blockquote>
+            </div>
+            <div class="voice-card dont">
+                <h4><span style="color: #E53E3E;">✗</span> Don't Write</h4>
+                <blockquote>"Our revolutionary AI solutions will transform your business with cutting-edge technology!"</blockquote>
+            </div>
+            <div class="voice-card do">
+                <h4><span style="color: #38A169;">✓</span> Do Write</h4>
+                <blockquote>"Master your AI with the discipline and precision of a true craftsman."</blockquote>
+            </div>
+            <div class="voice-card dont">
+                <h4><span style="color: #E53E3E;">✗</span> Don't Write</h4>
+                <blockquote>"Become an AI ninja with our game-changing solutions!"</blockquote>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 8: Contact -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">Section 08</div>
+            <h2>Contact & Assets</h2>
+            <p class="section-intro">For brand questions, asset requests, or partnership inquiries.</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h4>Website</h4>
+                <p>figsamurai.com</p>
+            </div>
+            <div class="contact-card">
+                <h4>Email</h4>
+                <p>hello@figsamurai.com</p>
+            </div>
+            <div class="contact-card">
+                <h4>Brand Assets</h4>
+                <p>figsamurai.com/brand</p>
+            </div>
+            <div class="contact-card">
+                <h4>Press Inquiries</h4>
+                <p>press@figsamurai.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="guide-footer">
+        <p>© 2025 FigSamurai. This brand guide and all assets are proprietary.</p>
+    </div>
+
+</body>
+</html>

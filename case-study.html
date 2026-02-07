@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Study: AI Credit News | FigSamurai Studio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .case-study-page {
+            background: var(--color-bg-primary);
+        }
+
+        /* Hero */
+        .case-hero {
+            padding: calc(80px + var(--spacing-3xl)) 0 var(--spacing-3xl);
+            background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
+        }
+
+        .case-hero-content {
+            max-width: 800px;
+        }
+
+        .case-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 0.5rem 1rem;
+            background: rgba(139, 115, 85, 0.2);
+            color: var(--color-bronze-light);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .case-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .case-hero h1 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .case-hero-desc {
+            font-size: 1.25rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+        }
+
+        .case-meta {
+            display: flex;
+            gap: var(--spacing-xl);
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        /* Screenshot Section */
+        .case-screenshot {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .screenshot-wrapper {
+            background: var(--color-bg-card);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .screenshot-browser {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--color-bg-tertiary);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .browser-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .browser-dots span:nth-child(1) { background: #FF5F57; }
+        .browser-dots span:nth-child(2) { background: #FEBC2E; }
+        .browser-dots span:nth-child(3) { background: #28C840; }
+
+        .browser-url {
+            flex: 1;
+            background: var(--color-bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        .screenshot-image {
+            padding: var(--spacing-xl);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .screenshot-placeholder {
+            text-align: center;
+        }
+
+        .screenshot-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: var(--spacing-sm);
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .screenshot-tagline {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .screenshot-features {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .screenshot-features span {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .screenshot-link {
+            margin-top: var(--spacing-lg);
+        }
+
+        /* Content Sections */
+        .case-section {
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .case-section:nth-child(even) {
+            background: var(--color-bg-secondary);
+        }
+
+        .case-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-2xl);
+            align-items: center;
+        }
+
+        .case-grid.reverse {
+            direction: rtl;
+        }
+
+        .case-grid.reverse > * {
+            direction: ltr;
+        }
+
+        .case-text h2 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .case-text p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-md);
+            line-height: 1.8;
+        }
+
+        .case-list {
+            margin-top: var(--spacing-md);
+        }
+
+        .case-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) 0;
+            color: var(--color-text-secondary);
+        }
+
+        .case-list .check {
+            color: var(--color-bronze-light);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Stats */
+        .case-visual {
+            background: var(--color-bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: var(--spacing-md);
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .stat-box .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--color-bronze-light);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-box .label {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Tech Stack */
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .tech-tag {
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: var(--spacing-xl);
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--color-bg-tertiary);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: var(--spacing-lg);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: calc(-1 * var(--spacing-xl) + 4px);
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            background: var(--color-bronze-light);
+            border-radius: 50%;
+        }
+
+        .timeline-day {
+            font-size: 0.75rem;
+            color: var(--color-bronze-light);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        /* CTA */
+        .case-cta {
+            padding: var(--spacing-3xl) 0;
+            text-align: center;
+        }
+
+        .case-cta h2 {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .case-cta p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-lg);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .case-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .case-grid.reverse {
+                direction: ltr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .case-meta {
+                gap: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body class="case-study-page">
+    <!-- Navigation -->
+    <nav class="navbar scrolled">
+        <div class="container">
+            <a href="/" class="logo">
+                <svg class="logo-icon" width="32" height="32" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+                    <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                </svg>
+                <span class="logo-text">Fig<span class="logo-highlight">Samurai</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="/#services">Services</a>
+                <a href="/#pricing">Pricing</a>
+                <a href="case-study.html">Case Study</a>
+                <a href="assessment.html" class="btn btn-primary">Free AI Assessment</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="case-hero">
+        <div class="container">
+            <div class="case-hero-content">
+                <div class="case-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    FigSamurai Studio Project
+                </div>
+                <h1>AI Credit News</h1>
+                <p class="case-hero-desc">How we built a fully automated AI-powered news platform for the financial sector in just 7 days.</p>
+                <div class="case-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Industry</span>
+                        <span class="meta-value">Financial Media</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Timeline</span>
+                        <span class="meta-value">7 Days</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Service</span>
+                        <span class="meta-value">Studio</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Status</span>
+                        <span class="meta-value" style="color: #28C840;">Live</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshot -->
+    <section class="case-screenshot">
+        <div class="container">
+            <div class="screenshot-wrapper">
+                <div class="screenshot-browser">
+                    <div class="browser-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="browser-url">aicreditnews.com</div>
+                </div>
+                <div class="screenshot-image">
+                    <div class="screenshot-placeholder">
+                        <div class="screenshot-logo">AI Credit News</div>
+                        <div class="screenshot-tagline">AI-Powered Financial Intelligence</div>
+                        <div class="screenshot-features">
+                            <span>Auto-curated articles</span>
+                            <span>AI summaries</span>
+                            <span>24/7 automation</span>
+                            <span>Admin dashboard</span>
+                        </div>
+                        <div class="screenshot-link">
+                            <a href="https://aicreditnews.com" target="_blank" class="btn btn-primary">Visit Live Site &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Challenge -->
+    <section class="case-section">
+        <div class="container">
+            <div class="case-grid">
+                <div class="case-text">
+                    <h2>The Challenge</h2>
+                    <p>The financial sector moves fast. Professionals need to stay updated on AI developments affecting credit, risk, and banking — but manually curating content from dozens of sources is time-consuming and expensive.</p>
+                    <p>We needed to create a platform that could:</p>
+                    <ul class="case-list">
+                        <li><span class="check">&#10003;</span> Monitor 16+ industry sources in real-time</li>
+                        <li><span class="check">&#10003;</span> Filter articles for AI relevance automatically</li>
+                        <li><span class="check">&#10003;</span> Generate professional summaries and categorizations</li>
+                        <li><span class="check">&#10003;</span> Run 24/7 with minimal human oversight</li>
+                        <li><span class="check">&#10003;</span> Maintain editorial quality and accuracy</li>
+                    </ul>
+                </div>
+                <div class="case-visual">
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="number">16+</div>
+                            <div class="label">RSS Sources</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="number">100+</div>
+                            <div class="label">Articles/Week</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="number">85%</div>
+                            <div class="label">Cost Reduction</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="number">24/7</div>
+                            <div class="label">Automation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Solution -->
+    <section class="case-section">
+        <div class="container">
+            <div class="case-grid reverse">
+                <div class="case-text">
+                    <h2>The Solution</h2>
+                    <p>We designed a multi-stage AI pipeline that handles the entire content lifecycle — from source monitoring to publication:</p>
+                    <ul class="case-list">
+                        <li><span class="check">&#10003;</span> <strong>Smart Scraping:</strong> RSS feeds from major financial publications, blogs, and news sites</li>
+                        <li><span class="check">&#10003;</span> <strong>Two-Stage Filtering:</strong> Fast Haiku model for title filtering, Sonnet for deep analysis (70% cost savings)</li>
+                        <li><span class="check">&#10003;</span> <strong>AI Processing:</strong> Automatic summarization, categorization, difficulty rating, and tagging</li>
+                        <li><span class="check">&#10003;</span> <strong>Admin Dashboard:</strong> Review queue for editorial oversight before publication</li>
+                        <li><span class="check">&#10003;</span> <strong>Auto-Publishing:</strong> Approved articles go live automatically</li>
+                    </ul>
+                </div>
+                <div class="case-visual">
+                    <h3 style="margin-bottom: var(--spacing-md);">Tech Stack</h3>
+                    <div class="tech-grid">
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">Express</span>
+                        <span class="tech-tag">SQLite</span>
+                        <span class="tech-tag">Claude AI</span>
+                        <span class="tech-tag">EJS Templates</span>
+                        <span class="tech-tag">Railway</span>
+                        <span class="tech-tag">Cron Jobs</span>
+                        <span class="tech-tag">RSS Parsing</span>
+                        <span class="tech-tag">Resend Email</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="case-section">
+        <div class="container">
+            <div class="case-grid">
+                <div class="case-text">
+                    <h2>7-Day Build Timeline</h2>
+                    <p>From concept to live site in one week. Here's how we did it:</p>
+                </div>
+                <div class="case-visual">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-day">Day 1-2</div>
+                            <div class="timeline-title">Architecture & Setup</div>
+                            <div class="timeline-desc">Database design, project scaffolding, RSS source identification</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-day">Day 3</div>
+                            <div class="timeline-title">Scraping Pipeline</div>
+                            <div class="timeline-desc">RSS parsing, article extraction, duplicate detection</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-day">Day 4</div>
+                            <div class="timeline-title">AI Integration</div>
+                            <div class="timeline-desc">Claude API integration, prompt engineering, cost optimization</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-day">Day 5</div>
+                            <div class="timeline-title">Admin Dashboard</div>
+                            <div class="timeline-desc">Authentication, review queue, approval workflow</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-day">Day 6</div>
+                            <div class="timeline-title">Frontend & Polish</div>
+                            <div class="timeline-desc">Public site design, responsive layout, SEO basics</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-day">Day 7</div>
+                            <div class="timeline-title">Deploy & Launch</div>
+                            <div class="timeline-desc">Railway deployment, DNS setup, monitoring, go live!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section class="case-section">
+        <div class="container">
+            <div class="case-grid reverse">
+                <div class="case-text">
+                    <h2>The Results</h2>
+                    <p>AI Credit News is now running autonomously, delivering fresh content daily with minimal oversight:</p>
+                    <ul class="case-list">
+                        <li><span class="check">&#10003;</span> <strong>100+ articles processed weekly</strong> from 16 sources</li>
+                        <li><span class="check">&#10003;</span> <strong>85% reduction</strong> in content curation costs vs. human editors</li>
+                        <li><span class="check">&#10003;</span> <strong>~5 minutes</strong> average admin time per day</li>
+                        <li><span class="check">&#10003;</span> <strong>Consistent quality</strong> with AI-generated summaries and categorization</li>
+                        <li><span class="check">&#10003;</span> <strong>Scalable infrastructure</strong> ready to add more sources</li>
+                    </ul>
+                </div>
+                <div class="case-visual">
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="number">7</div>
+                            <div class="label">Days to Launch</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="number">~$50</div>
+                            <div class="label">Monthly AI Cost</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="number">5 min</div>
+                            <div class="label">Daily Admin Time</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="number">Live</div>
+                            <div class="label">Running 24/7</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="case-cta">
+        <div class="container">
+            <h2>Want Something Like This?</h2>
+            <p>FigSamurai Studio can build your AI-powered platform in days, not months. Let's talk about your project.</p>
+            <div class="cta-buttons">
+                <a href="assessment.html" class="btn btn-primary btn-large">Take the AI Assessment</a>
+                <a href="https://aicreditnews.com" target="_blank" class="btn btn-secondary btn-large">Visit AI Credit News</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <svg class="logo-icon" width="32" height="32" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+                    <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                </svg>
+                        <span class="logo-text">Fig<span class="logo-highlight">Samurai</span></span>
+                    </a>
+                    <p>Master Your AI</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="/#services">Studio</a></li>
+                        <li><a href="/#services">Training</a></li>
+                        <li><a href="/#services">Labs</a></li>
+                        <li><a href="/#services">Academy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="case-study.html">Case Study</a></li>
+                        <li><a href="assessment.html">AI Assessment</a></li>
+                        <li><a href="/#pricing">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="mailto:hello@figsamurai.com">hello@figsamurai.com</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 FigSamurai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
