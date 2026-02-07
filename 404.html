@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found | FigSamurai</title>
+    <meta name="description" content="The page you're looking for doesn't exist. Return to FigSamurai homepage.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .error-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--spacing-xl);
+        }
+
+        .error-content {
+            max-width: 500px;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .error-content h1 {
+            font-size: 1.75rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .error-content p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-logo {
+            margin-bottom: var(--spacing-2xl);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-page">
+        <div class="error-content">
+            <a href="/" class="logo error-logo">
+                <svg class="logo-icon" width="48" height="48" viewBox="0 0 100 100" fill="none">
+                    <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+                    <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+                </svg>
+            </a>
+            <div class="error-code">404</div>
+            <h1>Path Not Found</h1>
+            <p>Even the sharpest samurai sometimes takes a wrong turn. The page you're looking for doesn't exist or has been moved.</p>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-large">Back to Home</a>
+                <a href="assessment.html" class="btn btn-secondary btn-large">Take AI Assessment</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
