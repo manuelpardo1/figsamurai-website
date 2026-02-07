@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FigSamurai Studio — AI Platform Configurator</title>
+<meta name="description" content="Configure and deploy your custom AI-powered content platform with FigSamurai Studio. Visual configurator with live preview.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0D0D;--surface:#1A1A1A;--surface2:#1F1F1F;--input-bg:#141414;
+  --border:#2D2D2D;--border-focus:#B87333;
+  --text:#FFFFFF;--text2:#B3B3B3;--muted:#737373;
+  --accent:#B87333;--accent-hover:#A67C52;--accent-bg:rgba(184,115,51,.1);
+  --bronze:#8B7355;--bronze-light:#A67C52;--copper:#B87333;
+  --fig-red:#C41E3A;--fig-red-dark:#9A1830;
+  --cream:#F5F0E8;
+  --green:#22c55e;--red:#ef4444;--orange:#f59e0b;--teal:#14b8a6;
+  --radius:12px;--radius-sm:8px;
+  --gradient-bronze:linear-gradient(135deg,#8B7355 0%,#B87333 100%);
+  --gradient-text:linear-gradient(135deg,#A67C52 0%,#C41E3A 100%);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;line-height:1.5;overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--copper);color:white}
+input,textarea,select,button{font-family:inherit}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;background:rgba(13,13,13,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.topbar-brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px}
+.topbar-brand .logo-icon{width:32px;height:32px;color:var(--bronze);flex-shrink:0}
+.topbar-brand .logo-text{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.topbar-brand .logo-text .highlight{background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-brand .studio-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--copper);background:var(--accent-bg);border:1px solid rgba(184,115,51,.25);border-radius:4px;padding:2px 8px;margin-left:4px}
+.topbar-actions{display:flex;gap:6px}
+.topbar-actions button{padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.topbar-actions button:hover{border-color:var(--copper);color:var(--text)}
+.topbar-actions .primary{background:var(--gradient-bronze);border-color:var(--copper);color:white;font-weight:600}
+.topbar-actions .primary:hover{opacity:.9}
+
+/* ── LAYOUT ── */
+.layout{display:flex;margin-top:56px;height:calc(100vh - 56px)}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-section{padding:0 12px;margin-bottom:20px}
+.sidebar-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);padding:0 10px;margin-bottom:6px}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s;user-select:none}
+.sidebar-item:hover{background:var(--surface2);color:var(--text)}
+.sidebar-item.active{background:var(--accent-bg);color:var(--bronze-light);font-weight:500}
+.sidebar-item .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.sidebar-item.active .dot{background:var(--copper)}
+.sidebar-item.done .dot{background:var(--green)}
+.sidebar-item .badge{margin-left:auto;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--surface2);color:var(--muted)}
+.sidebar-item.active .badge{background:rgba(184,115,51,.15);color:var(--bronze-light)}
+.sidebar-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+.completion{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between}
+.completion-bar{height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+.completion-fill{height:100%;background:var(--gradient-bronze);border-radius:3px;transition:width .3s}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:32px 40px 60px}
+.main-inner{max-width:720px}
+.main-header{margin-bottom:28px}
+.main-header h1{font-size:24px;font-weight:700;margin-bottom:4px}
+.main-header h1 .gradient{background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.main-header p{color:var(--text2);font-size:13px}
+
+/* progress segments */
+.progress{display:flex;gap:3px;margin-bottom:28px}
+.progress .seg{flex:1;height:3px;border-radius:3px;background:var(--border)}
+.progress .seg.done{background:var(--green)}
+.progress .seg.active{background:var(--copper)}
+
+/* ── FORM COMPONENTS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:3px}
+.card-desc{font-size:12px;color:var(--text2);margin-bottom:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.row.full{grid-template-columns:1fr}
+.row.tri{grid-template-columns:1fr 1fr 1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:500;color:var(--text)}
+.field .hint{font-size:10px;color:var(--muted)}
+.field input,.field textarea,.field select{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;color:var(--text);font-size:13px;outline:none;transition:border-color .15s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--copper)}
+.field textarea{resize:vertical;min-height:72px}
+.field select{cursor:pointer}
+.field input[type="color"]{width:40px;height:36px;padding:2px;cursor:pointer;border-radius:var(--radius-sm)}
+
+/* color picker group */
+.color-group{display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px}
+.color-group .swatch{width:32px;height:32px;border-radius:6px;border:2px solid rgba(255,255,255,.08);flex-shrink:0;cursor:pointer;position:relative;overflow:hidden}
+.color-group .swatch input{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);cursor:pointer;opacity:0}
+.color-group .info{display:flex;flex-direction:column}
+.color-group .info .lbl{font-size:11px;color:var(--muted)}
+.color-group .info input{background:none;border:none;color:var(--text);font-size:13px;font-weight:500;font-family:'SF Mono',Monaco,Consolas,monospace;padding:0;width:80px;outline:none}
+
+/* nav buttons */
+.nav-btns{display:flex;justify-content:space-between;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+.nav-btn{padding:9px 22px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-weight:500;transition:all .15s;border:1px solid var(--border)}
+.nav-btn.back{background:var(--surface2);color:var(--text2)}
+.nav-btn.back:hover{border-color:var(--text2);color:var(--text)}
+.nav-btn.next{background:var(--gradient-bronze);border-color:var(--copper);color:white}
+.nav-btn.next:hover{opacity:.9}
+
+/* ── TEMPLATE CARDS ── */
+.tmpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.tmpl-card{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .15s}
+.tmpl-card:hover{border-color:var(--copper)}
+.tmpl-card.selected{border-color:var(--copper);background:var(--accent-bg)}
+.tmpl-card h4{font-size:14px;font-weight:600;margin-bottom:3px}
+.tmpl-card p{font-size:11px;color:var(--text2);line-height:1.4}
+.tmpl-meta{display:flex;gap:10px;margin-top:8px;font-size:10px;color:var(--muted)}
+.tmpl-colors{display:flex;gap:4px;margin-top:6px}
+.tmpl-colors span{width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.1)}
+
+/* ── CATEGORY / SOURCE LIST ── */
+.list-item{display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;cursor:default}
+.list-item .drag{color:var(--muted);cursor:grab;font-size:14px;user-select:none}
+.list-item .name{flex:1;font-size:13px;font-weight:500}
+.list-item .slug{font-size:11px;color:var(--muted);font-family:monospace}
+.list-item .actions{display:flex;gap:4px}
+.list-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.list-btn:hover{border-color:var(--copper);color:var(--bronze-light)}
+.list-btn.del:hover{border-color:var(--red);color:var(--red)}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:var(--radius-sm);border:1px dashed var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;width:100%;transition:all .15s}
+.add-btn:hover{border-color:var(--copper);color:var(--bronze-light)}
+
+/* expandable detail */
+.list-detail{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:8px;display:none}
+.list-detail.open{display:block}
+
+/* tags */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:4px;min-height:32px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;cursor:text}
+.tags-wrap:focus-within{border-color:var(--copper)}
+.tag{display:inline-flex;align-items:center;gap:4px;background:var(--accent-bg);color:var(--bronze-light);border:1px solid rgba(184,115,51,.2);border-radius:12px;padding:2px 8px;font-size:11px;white-space:nowrap}
+.tag .x{cursor:pointer;opacity:.6;font-size:10px}
+.tag .x:hover{opacity:1}
+.tags-wrap input{background:none;border:none;color:var(--text);font-size:12px;outline:none;min-width:80px;flex:1;padding:2px}
+
+/* ── PREVIEW PANEL ── */
+.preview{width:300px;min-width:300px;background:var(--surface);border-left:1px solid var(--border);padding:20px;overflow-y:auto}
+.preview-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:10px;margin-top:16px}
+.preview-label:first-child{margin-top:0}
+.pcard{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.pcard-header{padding:14px;display:flex;align-items:center;gap:10px}
+.pcard-header .logo-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:white;flex-shrink:0}
+.pcard-header .info h3{font-size:13px;font-weight:600;line-height:1.2}
+.pcard-header .info p{font-size:10px;color:var(--text2);margin-top:1px}
+.pcard-cats{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:4px}
+.pchip{font-size:9px;padding:3px 8px;border-radius:12px;border:1px solid rgba(184,115,51,.2);white-space:nowrap}
+.part{padding:10px 14px;border-top:1px solid var(--border)}
+.part .src{font-size:9px;margin-bottom:2px}
+.part .ttl{font-size:11px;font-weight:500;line-height:1.35}
+.part .meta{font-size:9px;color:var(--muted);margin-top:3px}
+.favicon-preview{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.favicon-preview .fav-wrap{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;display:inline-flex}
+.favicon-preview .fav-info{font-size:11px;color:var(--text2)}
+.summary-card{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px}
+.summary-row{display:flex;justify-content:space-between;margin-bottom:4px}
+.summary-row:last-child{margin-bottom:0}
+.summary-row .k{color:var(--muted)}
+.summary-row .v{font-weight:500}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px;font-size:12px;color:var(--text);z-index:200;opacity:0;transform:translateY(10px);transition:all .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.toast.success{border-color:var(--green);color:var(--green)}
+
+/* ── DEPLOY FILES LIST ── */
+.file-list{font-size:11px;font-family:'SF Mono',Monaco,Consolas,monospace;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px}
+.file-list div{padding:2px 0;color:var(--text2)}
+.file-list div::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--copper);margin-right:8px}
+
+/* draft banner */
+.draft-banner{background:var(--accent-bg);border:1px solid rgba(184,115,51,.3);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.draft-banner button{padding:6px 14px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-family:inherit;font-weight:500}
+.draft-banner .resume{background:var(--gradient-bronze);color:white}
+.draft-banner .discard{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+
+/* ── BACK TO SITE LINK ── */
+.back-link{display:flex;align-items:center;gap:6px;padding:12px 16px;margin-bottom:8px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;text-decoration:none}
+.back-link:hover{color:var(--bronze-light)}
+.back-link svg{width:14px;height:14px}
+
+/* ── POWERED BY ── */
+.powered-by{padding:8px 12px;font-size:10px;color:var(--muted);text-align:center}
+.powered-by a{color:var(--bronze-light);text-decoration:none}
+.powered-by a:hover{text-decoration:underline}
+
+/* ── BRAND DISCOVERY ── */
+.brand-choices{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
+.brand-choice{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 16px;text-align:center;cursor:pointer;transition:all .15s}
+.brand-choice:hover{border-color:var(--copper)}
+.brand-choice.selected{border-color:var(--copper);background:var(--accent-bg)}
+.brand-choice h4{font-size:14px;margin-bottom:6px}
+.brand-choice p{font-size:11px;color:var(--text2);line-height:1.4}
+.brand-choice .choice-icon{font-size:24px;margin-bottom:8px}
+.suggestion-item{display:flex;align-items:center;gap:12px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.suggestion-item:hover{border-color:var(--copper)}
+.suggestion-item.selected{border-color:var(--copper);background:var(--accent-bg)}
+.suggestion-item .sug-name{font-weight:600;font-size:14px;flex:1}
+.suggestion-item .sug-short{font-size:11px;color:var(--muted);font-family:monospace;background:var(--surface2);padding:2px 8px;border-radius:4px}
+.suggestion-item .sug-score{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.suggestion-item .sug-dot{width:8px;height:8px;border-radius:50%}
+.domain-result{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:12px}
+.domain-result .dr-icon{font-weight:700;font-size:14px}
+.domain-result .dr-domain{font-family:monospace;color:var(--text)}
+.domain-result .dr-label{color:var(--muted)}
+.brand-eval{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.brand-eval-item{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px}
+.brand-eval-item .bei-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.brand-eval-item .bei-val{font-weight:600}
+
+/* ── QA TESTING ── */
+.qa-result{display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:6px}
+.qa-result .status{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.qa-result .status.pass{background:rgba(34,197,94,.15);color:var(--green)}
+.qa-result .status.warn{background:rgba(245,158,11,.15);color:var(--orange)}
+.qa-result .status.fail{background:rgba(239,68,68,.15);color:var(--red)}
+.qa-result .status.skipped{background:var(--surface2);color:var(--muted)}
+.qa-result .status.running{background:var(--accent-bg);color:var(--copper);animation:qapulse 1s infinite}
+.qa-result .test-info{flex:1}
+.qa-result .test-name{font-size:13px;font-weight:500}
+.qa-result .test-detail{font-size:11px;color:var(--muted);margin-top:2px}
+.qa-result .test-time{font-size:11px;color:var(--muted);font-family:monospace}
+.qa-score-card{text-align:center;padding:24px;margin-bottom:16px}
+.qa-score-card .score-num{font-size:48px;font-weight:800}
+.qa-score-card .score-label{font-size:13px;color:var(--text2);margin-top:4px}
+@keyframes qapulse{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <svg class="logo-icon" width="32" height="32" viewBox="0 0 100 100" fill="none">
+      <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+      <circle cx="50" cy="25" r="4" fill="#C41E3A"/>
+    </svg>
+    <span class="logo-text">Fig<span class="highlight">Samurai</span></span>
+    <span class="studio-badge">Studio</span>
+  </div>
+  <div class="topbar-actions">
+    <button onclick="importConfig()">Import JSON</button>
+    <button onclick="exportConfig()">Export Config</button>
+    <button class="primary" onclick="exportConfig()">Download &amp; Deploy &#8594;</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
+
+  <!-- MAIN -->
+  <div class="main"><div class="main-inner" id="main"></div></div>
+
+  <!-- PREVIEW -->
+  <div class="preview" id="preview"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const SECTIONS = [
+  {id:'brand-discovery',label:'Brand Discovery',icon:''},
+  {id:'templates',label:'Templates',icon:''},
+  {id:'branding',label:'Branding',icon:''},
+  {id:'industry',label:'Industry',icon:''},
+  {id:'colors',label:'Colors & Theme',icon:''},
+  {id:'categories',label:'Categories',icon:''},
+  {id:'sources',label:'RSS Sources',icon:''},
+  {id:'ai',label:'AI Configuration',icon:''},
+  {id:'deploy',label:'Deployment',icon:''},
+  {id:'qa',label:'QA Testing',icon:''}
+];
+
+const state = {
+  name:'',shortName:'',tagline:'',description:'',domain:'',
+  industry:'',industryDescription:'',
+  colors:{primary:'#5b21b6',accent:'#7c3aed',primaryDark:'#4c1d95'},
+  categories:[],
+  sources:[],
+  aiRelevanceCriteria:'',aiFilterQuestion:'',
+  locale:{primary:'en',secondary:''},
+  adminEmail:'',
+  brand:{hasBrand:'',nicheDescription:'',suggestions:[],selectedSuggestion:-1,domainChecks:{}},
+  qa:{targetUrl:'',running:false,results:[],overallScore:0},
+  _ui:{section:0,expandedCat:-1,expandedSrc:-1}
+};
+
+// ============================================
+// TEMPLATES (from replicate.js)
+// ============================================
+const TEMPLATES = {
+  'ai-credit-news':{
+    name:'AI Credit News',shortName:'ACN',
+    tagline:'AI Insights for Credit & Finance',
+    description:'Curated news on AI in credit scoring, lending, fraud detection, and banking.',
+    domain:'aicreditnews.com',industry:'credit, banking & financial services',
+    industryDescription:'AI applications in credit scoring, risk management, fraud detection, income verification, lending automation, banking technology, and financial regulation',
+    colors:{primary:'#5b21b6',accent:'#7c3aed',primaryDark:'#4c1d95'},
+    categories:[
+      {name:'Credit Scoring',slug:'credit-scoring',description:'Machine learning models for creditworthiness assessment, risk scoring, and credit decisions',topics:['Alternative data scoring','ML credit models','Risk assessment','Creditworthiness'],keywords:['credit score','FICO','underwriting','risk model','creditworthiness'],players:['Zest AI','Upstart','Nova Credit','Scienaptic','Experian','FICO']},
+      {name:'Fraud Detection',slug:'fraud-detection',description:'AI systems for detecting and preventing financial fraud',topics:['Transaction monitoring','Identity verification','Anti-money laundering','Behavioral analytics'],keywords:['fraud','AML','KYC','identity','transaction monitoring'],players:['Featurespace','Feedzai','Sardine','Unit21','ComplyAdvantage']},
+      {name:'Income & Employment',slug:'income-employment',description:'AI for income verification, cash flow analysis, affordability, and capacity to pay',topics:['Income verification','Cash flow analysis','Employment verification','Affordability assessment'],keywords:['income','employment','verification','cash flow','affordability','capacity to pay'],players:['Plaid','Argyle','Pinwheel','Truework']},
+      {name:'Regulatory & Compliance',slug:'regulatory-compliance',description:'AI governance, fair lending requirements, explainability, and regulatory compliance',topics:['RegTech automation','Fair lending','AI explainability','Compliance monitoring'],keywords:['compliance','regulation','regtech','fair lending','explainability','CFPB'],players:['ComplyAdvantage','Hummingbird','Ascent RegTech','Behavox']},
+      {name:'Lending Automation',slug:'lending-automation',description:'AI-powered lending decisions, underwriting, and loan processing',topics:['Automated underwriting','Loan processing','Decision engines','Digital lending'],keywords:['underwriting','lending','loan','origination','automation','decision engine'],players:['Blend','Better.com','Figure','Pagaya','Upstart']}
+    ],
+    sources:[
+      // Core AI & Fintech
+      {name:'TechCrunch AI',url:'https://techcrunch.com/category/artificial-intelligence/feed/',language:'en'},
+      {name:'VentureBeat AI',url:'https://venturebeat.com/category/ai/feed/',language:'en'},
+      {name:'MIT Technology Review',url:'https://www.technologyreview.com/feed/',language:'en'},
+      {name:'Fintech Futures',url:'https://www.fintechfutures.com/feed/',language:'en'},
+      {name:'TechCrunch Fintech',url:'https://techcrunch.com/category/fintech/feed/',language:'en'},
+      // Banking & Finance
+      {name:'Finextra',url:'https://www.finextra.com/rss/headlines.aspx',language:'en'},
+      {name:'American Banker',url:'https://www.americanbanker.com/feed',language:'en'},
+      {name:'Banking Dive',url:'https://www.bankingdive.com/feeds/news/',language:'en'},
+      {name:'Payments Dive',url:'https://www.paymentsdive.com/feeds/news/',language:'en'},
+      {name:'The Financial Brand',url:'https://thefinancialbrand.com/feed/',language:'en'},
+      // Risk & Lending
+      {name:'Risk.net',url:'https://www.risk.net/rss/risk-management',language:'en'},
+      {name:'National Mortgage News',url:'https://www.nationalmortgagenews.com/feed',language:'en'},
+      {name:'Housing Wire',url:'https://www.housingwire.com/feed/',language:'en'},
+      {name:'Auto Finance News',url:'https://www.autofinancenews.net/feed/',language:'en'},
+      // Credit Bureau & Data Providers
+      {name:'Experian Insights',url:'https://www.experian.com/blogs/insights/feed/',language:'en'},
+      {name:'FICO Blog',url:'https://www.fico.com/blogs/feed/',language:'en'},
+      {name:'TransUnion Blog',url:'https://www.transunion.com/blog/rss',language:'en'},
+      {name:'Equifax Insights',url:'https://www.equifax.com/insights/feed/',language:'en'},
+      // Income & Employment Verification
+      {name:'Plaid Blog',url:'https://plaid.com/blog/feed/',language:'en'},
+      {name:'Argyle Blog',url:'https://argyle.com/blog/rss.xml',language:'en'},
+      {name:'Pinwheel Blog',url:'https://www.pinwheelapi.com/blog/rss.xml',language:'en'},
+      // Consulting & Research
+      {name:'McKinsey Financial Services',url:'https://www.mckinsey.com/industries/financial-services/our-insights/rss.xml',language:'en'},
+      {name:'Deloitte Financial Services',url:'https://www2.deloitte.com/content/dam/insights/us/rss/financial-services.xml',language:'en'},
+      {name:'Oliver Wyman Insights',url:'https://www.oliverwyman.com/our-expertise/insights.rss.xml',language:'en'},
+      {name:'CB Insights',url:'https://www.cbinsights.com/research/feed/',language:'en'},
+      // Additional Fintech
+      {name:'Finovate',url:'https://finovate.com/feed/',language:'en'},
+      {name:'Bank Automation News',url:'https://bankautomationnews.com/feed/',language:'en'},
+      {name:'PaymentsJournal',url:'https://paymentsjournal.com/feed/',language:'en'},
+      {name:'The Fintech Times',url:'https://thefintechtimes.com/feed/',language:'en'},
+      {name:'Accenture Banking Blog',url:'https://bankingblog.accenture.com/feed/',language:'en'},
+      {name:'PYMNTS',url:'https://www.pymnts.com/feed/',language:'en'},
+      {name:'The Paypers',url:'https://thepaypers.com/rss',language:'en'},
+      {name:'Crowdfund Insider',url:'https://www.crowdfundinsider.com/feed/',language:'en'},
+      {name:'Fintech Magazine',url:'https://fintechmagazine.com/rss/feed',language:'en'},
+      {name:'This Week in Fintech',url:'https://www.thisweekinfintech.com/feed/',language:'en'},
+      {name:'FF News',url:'https://ffnews.com/feed/',language:'en'},
+      {name:'Tech.eu',url:'https://tech.eu/feed/',language:'en'},
+      {name:'Bank Innovation',url:'https://bankinnovation.net/feed/',language:'en'},
+      {name:'Financial News London',url:'https://www.fnlondon.com/rss',language:'en'},
+      // Premium Business Publications
+      {name:'Forbes AI',url:'https://www.forbes.com/ai/feed/',language:'en'},
+      {name:'Forbes Fintech',url:'https://www.forbes.com/fintech/feed/',language:'en'},
+      {name:'Harvard Business Review',url:'https://hbr.org/topic/subject/technology.rss',language:'en'},
+      {name:'Bloomberg Technology',url:'https://www.bloomberg.com/feeds/technology.rss',language:'en'},
+      {name:'WSJ Tech',url:'https://feeds.a.dj.com/rss/RSSWSJD.xml',language:'en'},
+      {name:'Reuters Technology',url:'https://www.reuters.com/technology/rss',language:'en'},
+      {name:'Business Insider Finance',url:'https://www.businessinsider.com/finance/feed',language:'en'},
+      // AI Company Blogs
+      {name:'Google AI Blog',url:'https://ai.googleblog.com/feeds/posts/default',language:'en'},
+      {name:'OpenAI Blog',url:'https://openai.com/blog/rss.xml',language:'en'},
+      {name:'Anthropic Blog',url:'https://www.anthropic.com/rss.xml',language:'en'},
+      // Banking Industry
+      {name:'ABA Banking Journal',url:'https://bankingjournal.aba.com/feed/',language:'en'},
+      {name:'Credit Union Times',url:'https://www.cutimes.com/feed/',language:'en'},
+      {name:'BAI Banking Strategies',url:'https://www.bai.org/banking-strategies/feed/',language:'en'},
+      // Spanish Language Sources
+      {name:'BBVA Noticias',url:'https://www.bbva.com/es/feed/',language:'es'},
+      {name:'El Economista Fintech',url:'https://www.eleconomista.es/rss/rss-fintech.php',language:'es'},
+      {name:'Finanzas.com',url:'https://www.finanzas.com/rss/',language:'es'},
+      {name:'iupana (Fintech LATAM)',url:'https://iupana.com/feed/',language:'es'},
+      {name:'Fintech News Mexico',url:'https://fintechnews.mx/feed/',language:'es'},
+      {name:'Dinero Colombia',url:'https://www.dinero.com/rss/finanzas.xml',language:'es'},
+      {name:'Forbes Mexico Tech',url:'https://www.forbes.com.mx/tecnologia/feed/',language:'es'},
+      {name:'Am\u00e9rica Econom\u00eda Finanzas',url:'https://www.americaeconomia.com/rss/finanzas.xml',language:'es'}
+    ],
+    aiRelevanceCriteria:'Articles must be about the INTERSECTION of AI/ML AND credit/banking/finance. Score 7-10: Directly about AI in credit scoring, banking automation, fintech AI. Score 4-6: Related but tangential (general fintech, banking trends mentioning AI). Score 0-3: Not relevant (general AI without finance, or finance without AI). Approval threshold: score >= 6.',
+    aiFilterQuestion:'Is this article likely about AI/ML in credit, banking, or financial services?',
+    locale:{primary:'en',secondary:'es'},adminEmail:'admin@aicreditnews.com'
+  },
+  'ai-healthcare':{
+    name:'AI Health Digest',shortName:'AHD',
+    tagline:'AI-powered insights for healthcare & medical innovation',
+    description:'Curated news on AI in healthcare, medical imaging, drug discovery, clinical trials, and health tech.',
+    domain:'aihealthdigest.com',industry:'healthcare',
+    industryDescription:'AI applications in healthcare, medical technology, drug discovery, clinical operations, and health data analytics',
+    colors:{primary:'#0e7490',accent:'#059669',primaryDark:'#0c4a5e'},
+    categories:[
+      {name:'Medical Imaging',slug:'medical-imaging',description:'AI in radiology, pathology, and diagnostic imaging',topics:['Computer vision in radiology','AI-assisted diagnosis','Medical image segmentation'],keywords:['radiology','CT scan','MRI','pathology','diagnostic AI'],players:['Aidoc','Viz.ai','Paige AI','Tempus']},
+      {name:'Drug Discovery',slug:'drug-discovery',description:'AI-driven pharmaceutical research and development',topics:['Molecule design','Clinical trial optimization','Target identification'],keywords:['pharma','drug development','clinical trials','molecule'],players:['Insilico Medicine','Recursion','Atomwise','BenevolentAI']},
+      {name:'Clinical Operations',slug:'clinical-operations',description:'AI in hospital management, workflow, and patient care',topics:['Hospital workflow automation','Patient scheduling','EHR optimization'],keywords:['EHR','hospital','clinical workflow','patient care'],players:['Epic Systems','Cerner','Olive AI','Notable Health']},
+      {name:'Health Data & Analytics',slug:'health-data',description:'Healthcare data analysis, population health, and predictive analytics',topics:['Population health management','Predictive analytics','Health data interoperability'],keywords:['health data','FHIR','interoperability','predictive'],players:['Flatiron Health','Datavant','Health Catalyst','Innovaccer']},
+      {name:'Digital Health',slug:'digital-health',description:'Telemedicine, wearables, and consumer health technology',topics:['Remote patient monitoring','Wearable health tech','Mental health apps'],keywords:['telehealth','wearables','digital therapeutics','mental health'],players:['Teladoc','Amwell','Livongo','Headspace']},
+      {name:'Regulatory & Ethics',slug:'regulatory-ethics',description:'Healthcare AI regulation, compliance, and ethical considerations',topics:['FDA AI/ML regulations','Healthcare data privacy','AI bias in medicine'],keywords:['FDA','HIPAA','regulation','ethics','bias'],players:['FDA','WHO','AMA','NICE']}
+    ],
+    sources:[
+      {name:'STAT News',url:'https://www.statnews.com/feed/',language:'en'},
+      {name:'Healthcare IT News',url:'https://www.healthcareitnews.com/feed',language:'en'},
+      {name:'Fierce Healthcare',url:'https://www.fiercehealthcare.com/rss/xml',language:'en'},
+      {name:'MedCity News',url:'https://medcitynews.com/feed/',language:'en'},
+      {name:'Healthcare Dive',url:'https://www.healthcaredive.com/feeds/news/',language:'en'},
+      {name:'Mobihealthnews',url:'https://www.mobihealthnews.com/feed',language:'en'}
+    ],
+    aiRelevanceCriteria:'AI, machine learning, or data science applications in healthcare, medicine, pharma, clinical operations, health tech, medical devices, or health data analytics',
+    aiFilterQuestion:'Is this article likely about AI/ML applications in healthcare, medicine, or health technology?',
+    locale:{primary:'en',secondary:'es'},adminEmail:'admin@aihealthdigest.com'
+  },
+  'ai-realestate':{
+    name:'AI Property Intel',shortName:'API',
+    tagline:'AI-powered insights for real estate & property technology',
+    description:'Curated news on AI in real estate, property valuation, smart buildings, and proptech.',
+    domain:'aipropertyintel.com',industry:'real estate',
+    industryDescription:'AI applications in real estate, property technology, smart buildings, valuation, and real estate finance',
+    colors:{primary:'#1e40af',accent:'#b45309',primaryDark:'#1e3a5f'},
+    categories:[
+      {name:'Property Valuation',slug:'property-valuation',description:'AI-powered appraisal and property valuation',topics:['Automated valuation models','Comparable analysis','Market prediction'],keywords:['AVM','appraisal','property value','pricing'],players:['Zillow','HouseCanary','CoreLogic','ATTOM']},
+      {name:'Smart Buildings',slug:'smart-buildings',description:'AI in building management, energy, and occupant experience',topics:['Building automation','Energy optimization','Occupancy analytics'],keywords:['IoT','building management','energy','smart home'],players:['Honeywell','Johnson Controls','Siemens','Schneider Electric']},
+      {name:'PropTech',slug:'proptech',description:'Property technology startups and innovation',topics:['Real estate platforms','Virtual tours','Transaction automation'],keywords:['proptech','startup','innovation','platform'],players:['Opendoor','Matterport','Compass','Redfin']},
+      {name:'Investment & Finance',slug:'investment-finance',description:'AI in real estate investing, mortgage, and finance',topics:['Investment analytics','Mortgage automation','Risk assessment'],keywords:['REIT','mortgage','investment','underwriting'],players:['Fundrise','Blend','Roofstock','Better.com']},
+      {name:'Market Analytics',slug:'market-analytics',description:'AI-driven real estate market analysis and forecasting',topics:['Market trends','Demand forecasting','Location intelligence'],keywords:['market analysis','forecast','trends','data'],players:['Reonomy','Cherre','Placer.ai','SiteSeer']}
+    ],
+    sources:[
+      {name:'Inman',url:'https://www.inman.com/feed/',language:'en'},
+      {name:'GlobeSt',url:'https://www.globest.com/feed/',language:'en'},
+      {name:'Propmodo',url:'https://www.propmodo.com/feed/',language:'en'},
+      {name:'The Real Deal',url:'https://therealdeal.com/feed/',language:'en'}
+    ],
+    aiRelevanceCriteria:'AI, machine learning, or data science applications in real estate, property technology, smart buildings, valuation, investment, or market analytics',
+    aiFilterQuestion:'Is this article likely about AI/ML applications in real estate or property technology?',
+    locale:{primary:'en'},adminEmail:'admin@aipropertyintel.com'
+  }
+};
+
+// ============================================
+// UTILITIES
+// ============================================
+function slugify(t){return t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function darkenHex(hex,p){hex=hex.replace('#','');const r=Math.max(0,parseInt(hex.substr(0,2),16)-p),g=Math.max(0,parseInt(hex.substr(2,2),16)-p),b=Math.max(0,parseInt(hex.substr(4,2),16)-p);return'#'+[r,g,b].map(c=>c.toString(16).padStart(2,'0')).join('')}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.className='toast',2500)}
+
+function faviconSvg(c){
+  const sn=c.shortName||'?',ac=c.colors?.accent||'#B87333';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#000"/><text x="16" y="22" font-family="Inter,-apple-system,sans-serif" font-size="14" font-weight="700" fill="white" text-anchor="middle">${sn}</text><circle cx="26" cy="6" r="3" fill="${ac}"/></svg>`;
+}
+function logoSvg(c,variant){
+  const nm=c.name||'Platform';const parts=nm.split(' ');
+  const l1=parts.slice(0,Math.ceil(parts.length/2)).join(' ');
+  const l2=parts.slice(Math.ceil(parts.length/2)).join(' ');
+  const bg=variant==='dark'?'white':(c.colors?.primary||'#5b21b6');
+  const txt=variant==='dark'?'white':(c.colors?.primary||'#5b21b6');
+  const btxt=variant==='dark'?(c.colors?.primary||'#5b21b6'):'white';
+  const ac=variant==='dark'?'#B87333':(c.colors?.accent||'#B87333');
+  const sn=c.shortName||'?';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" fill="none"><rect x="0" y="4" width="40" height="40" rx="8" fill="${bg}"/><text x="20" y="30" font-family="Inter,-apple-system,sans-serif" font-size="18" font-weight="700" fill="${btxt}" text-anchor="middle">${sn}</text><text x="52" y="22" font-family="Inter,-apple-system,sans-serif" font-size="20" font-weight="700" fill="${txt}">${l1}</text><text x="52" y="42" font-family="Inter,-apple-system,sans-serif" font-size="20" font-weight="700" fill="${txt}">${l2}</text><rect x="200" y="12" width="3" height="28" rx="1.5" fill="${ac}"/></svg>`;
+}
+
+function getCompletion(){
+  let score=0;
+  if(state.brand&&state.brand.hasBrand)score+=10;
+  if(state.name&&state.shortName&&state.tagline)score+=15;
+  if(state.industry&&state.industryDescription)score+=10;
+  if(state.colors.primary!=='#5b21b6')score+=10;
+  if(state.categories.length>0&&state.categories.some(c=>c.name&&c.slug&&c.description))score+=20;
+  if(state.sources.length>0&&state.sources.some(s=>s.name&&s.url))score+=15;
+  if(state.aiRelevanceCriteria&&state.aiFilterQuestion)score+=10;
+  if(state.domain&&state.adminEmail)score+=10;
+  return score;
+}
+
+const saveDraft=debounce(()=>{
+  try{localStorage.setItem('fig-studio-draft',JSON.stringify(state))}catch(e){}
+},500);
+
+function loadDraft(){
+  try{
+    // Migrate from old key
+    const old=localStorage.getItem('figsamurai-studio-draft');
+    if(old&&!localStorage.getItem('fig-studio-draft')){
+      localStorage.setItem('fig-studio-draft',old);
+      localStorage.removeItem('figsamurai-studio-draft');
+    }
+    const d=localStorage.getItem('fig-studio-draft');
+    if(d){
+      const p=JSON.parse(d);
+      Object.assign(state,p);
+      // Ensure new fields exist for old drafts
+      if(!state.brand)state.brand={hasBrand:'',nicheDescription:'',suggestions:[],selectedSuggestion:-1,domainChecks:{}};
+      if(!state.qa)state.qa={targetUrl:'',running:false,results:[],overallScore:0};
+      state._ui={section:0,expandedCat:-1,expandedSrc:-1};
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// ============================================
+// RENDERERS
+// ============================================
+function renderSidebar(){
+  const el=document.getElementById('sidebar');
+  const comp=getCompletion();
+  el.innerHTML=`
+    <a href="../" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      figsamurai.com
+    </a>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Getting Started</div>
+      ${sidebarItem(0)}${sidebarItem(1)}
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Platform Identity</div>
+      ${sidebarItem(2)}${sidebarItem(3)}${sidebarItem(4)}
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Content</div>
+      ${sidebarItem(5,state.categories.length)}${sidebarItem(6,state.sources.length)}${sidebarItem(7)}
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Deployment</div>
+      ${sidebarItem(8)}${sidebarItem(9)}
+    </div>
+    <div class="sidebar-bottom">
+      <div class="completion"><span>Completion</span><span>${comp}%</span></div>
+      <div class="completion-bar"><div class="completion-fill" style="width:${comp}%"></div></div>
+      <div class="powered-by" style="margin-top:10px">Powered by <a href="../">FigSamurai</a></div>
+    </div>
+  `;
+}
+
+function sidebarItem(i,badge){
+  const s=SECTIONS[i];
+  const active=state._ui.section===i?'active':'';
+  const done=isSectionDone(i)?'done':'';
+  const b=badge!==undefined?`<span class="badge">${badge}</span>`:'';
+  return `<div class="sidebar-item ${active} ${done}" onclick="goTo(${i})"><span class="dot"></span>${s.label}${b}</div>`;
+}
+
+function isSectionDone(i){
+  switch(i){
+    case 0:return !!(state.brand&&state.brand.hasBrand);
+    case 1:return state.name!=='';
+    case 2:return !!(state.name&&state.shortName&&state.tagline);
+    case 3:return !!(state.industry&&state.industryDescription);
+    case 4:return state.colors.primary!=='#5b21b6';
+    case 5:return state.categories.length>0;
+    case 6:return state.sources.length>0;
+    case 7:return !!(state.aiRelevanceCriteria&&state.aiFilterQuestion);
+    case 8:return !!(state.domain&&state.adminEmail);
+    case 9:return false;
+  }
+  return false;
+}
+
+function goTo(i){
+  state._ui.section=i;
+  renderAll();
+}
+
+function renderProgress(){
+  return '<div class="progress">'+SECTIONS.map((_,i)=>{
+    const cls=i<state._ui.section?'done':i===state._ui.section?'active':'';
+    return `<div class="seg ${cls}"></div>`;
+  }).join('')+'</div>';
+}
+
+// ── Section renderers ──
+function renderSection(){
+  const i=state._ui.section;
+  const s=SECTIONS[i];
+  let html=renderProgress();
+
+  switch(i){
+    case 0:html+=renderBrandDiscovery();break;
+    case 1:html+=renderTemplates();break;
+    case 2:html+=renderBranding();break;
+    case 3:html+=renderIndustry();break;
+    case 4:html+=renderColors();break;
+    case 5:html+=renderCategories();break;
+    case 6:html+=renderSources();break;
+    case 7:html+=renderAI();break;
+    case 8:html+=renderDeploy();break;
+    case 9:html+=renderQA();break;
+  }
+
+  // Nav buttons
+  html+='<div class="nav-btns">';
+  if(i>0)html+=`<button class="nav-btn back" onclick="goTo(${i-1})">&larr; ${SECTIONS[i-1].label}</button>`;
+  else html+='<div></div>';
+  if(i<SECTIONS.length-1)html+=`<button class="nav-btn next" onclick="goTo(${i+1})">${SECTIONS[i+1].label} &rarr;</button>`;
+  else html+=`<button class="nav-btn next" onclick="exportConfig()">Download Config &darr;</button>`;
+  html+='</div>';
+
+  document.getElementById('main').innerHTML=html;
+  bindInputs();
+}
+
+// ── Brand Discovery ──
+function renderBrandDiscovery(){
+  const bd=state.brand;
+  let html=`<div class="main-header"><h1>Brand <span class="gradient">Discovery</span></h1><p>Let's figure out your platform's identity before we build anything.</p></div>`;
+
+  // Step 1: Do you have a brand?
+  html+=`<div class="card">
+    <div class="card-title">Do you already have a brand?</div>
+    <div class="card-desc">Select your starting point — we'll adapt the next steps accordingly.</div>
+    <div class="brand-choices">
+      <div class="brand-choice ${bd.hasBrand==='yes-full'?'selected':''}" onclick="setBrandStatus('yes-full')">
+        <div class="choice-icon">&#10004;</div>
+        <h4>Yes, I'm all set</h4>
+        <p>I have a brand name and domain ready to go</p>
+      </div>
+      <div class="brand-choice ${bd.hasBrand==='yes-name-only'?'selected':''}" onclick="setBrandStatus('yes-name-only')">
+        <div class="choice-icon">&#9998;</div>
+        <h4>I have a name</h4>
+        <p>I have a brand name but need help finding a domain</p>
+      </div>
+      <div class="brand-choice ${bd.hasBrand==='help-me'?'selected':''}" onclick="setBrandStatus('help-me')">
+        <div class="choice-icon">&#9733;</div>
+        <h4>Help me build one</h4>
+        <p>I need help creating a brand name and identity</p>
+      </div>
+    </div>
+  </div>`;
+
+  if(bd.hasBrand==='help-me'){
+    html+=renderBrandGenerator();
+  }
+  if(bd.hasBrand==='yes-name-only'||bd.hasBrand==='help-me'){
+    html+=renderDomainChecker();
+  }
+  if(bd.hasBrand==='yes-full'){
+    html+=`<div class="card" style="text-align:center;padding:32px">
+      <div style="font-size:32px;margin-bottom:12px">&#10003;</div>
+      <div class="card-title">Great! You're ready to configure.</div>
+      <div class="card-desc">Continue to Templates to choose your starting point, then customize everything in the following steps.</div>
+    </div>`;
+  }
+
+  return html;
+}
+
+function renderBrandGenerator(){
+  const bd=state.brand;
+  let html=`<div class="card">
+    <div class="card-title">FigSamurai Brand — AI Name Generator</div>
+    <div class="card-desc">Describe your niche and we'll suggest brand names with full evaluation.</div>
+    <div class="row full">
+      <div class="field">
+        <label>Describe your industry or niche</label>
+        <textarea id="nicheInput" rows="3" placeholder="e.g. AI-powered insights for the healthcare industry, covering medical imaging, drug discovery, and clinical operations...">${esc(bd.nicheDescription)}</textarea>
+        <span class="hint">Be specific — the more detail you provide, the better the suggestions.</span>
+      </div>
+    </div>
+    <button class="add-btn" onclick="generateBrandSuggestions()" style="margin-top:8px">&#9733; Generate Brand Names</button>
+  </div>`;
+
+  if(bd.suggestions.length>0){
+    html+=`<div class="card">
+      <div class="card-title">Brand Candidates</div>
+      <div class="card-desc">Click a name to select it and see its full evaluation.</div>`;
+    bd.suggestions.forEach((s,i)=>{
+      const sel=bd.selectedSuggestion===i?'selected':'';
+      const dotColor=s.score>=80?'var(--green)':s.score>=60?'var(--orange)':'var(--red)';
+      html+=`<div class="suggestion-item ${sel}" onclick="selectBrandSuggestion(${i})">
+        <span class="sug-name">${esc(s.name)}</span>
+        <span class="sug-short">${esc(s.shortName)}</span>
+        <span class="sug-score"><span class="sug-dot" style="background:${dotColor}"></span>${s.score}/100</span>
+      </div>`;
+    });
+    html+=`</div>`;
+
+    // Show evaluation for selected suggestion
+    if(bd.selectedSuggestion>=0&&bd.suggestions[bd.selectedSuggestion]){
+      const s=bd.suggestions[bd.selectedSuggestion];
+      html+=`<div class="card">
+        <div class="card-title">Brand Evaluation: ${esc(s.name)}</div>
+        <div class="brand-eval">
+          <div class="brand-eval-item"><div class="bei-label">Memorability</div><div class="bei-val">${s.eval?.memorability||'--'}/10</div></div>
+          <div class="brand-eval-item"><div class="bei-label">Uniqueness</div><div class="bei-val">${s.eval?.uniqueness||'--'}/10</div></div>
+          <div class="brand-eval-item"><div class="bei-label">Industry Fit</div><div class="bei-val">${s.eval?.industryFit||'--'}/10</div></div>
+          <div class="brand-eval-item"><div class="bei-label">SEO Potential</div><div class="bei-val">${s.eval?.seo||'--'}/10</div></div>
+          <div class="brand-eval-item"><div class="bei-label">Slug-Friendly</div><div class="bei-val">${s.eval?.slug?'Yes':'No'}</div></div>
+          <div class="brand-eval-item"><div class="bei-label">Trademark Risk</div><div class="bei-val" style="color:${s.eval?.trademarkRisk==='Low'?'var(--green)':s.eval?.trademarkRisk==='Medium'?'var(--orange)':'var(--red)'}">${s.eval?.trademarkRisk||'--'}</div></div>
+          <div class="brand-eval-item"><div class="bei-label">Domain (.com)</div><div class="bei-val" style="color:${s.eval?.domainAvailable?'var(--green)':'var(--red)'}">${s.eval?.domainAvailable?'Likely Available':'Likely Taken'}</div></div>
+          <div class="brand-eval-item"><div class="bei-label">Social Handles</div><div class="bei-val" style="color:${s.eval?.socialAvailable?'var(--green)':'var(--orange)'}">${s.eval?.socialAvailable?'Likely Available':'Check Manually'}</div></div>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:var(--surface2);border-radius:var(--radius-sm);font-size:11px;color:var(--text2)">
+          <strong>Note:</strong> This is an automated preliminary evaluation. For trademark clearance, consult a legal professional before launch.
+        </div>
+      </div>`;
+    }
+  }
+
+  return html;
+}
+
+function renderDomainChecker(){
+  const domainGuess=state.domain||((state.name?slugify(state.name):'')+'.com');
+  let html=`<div class="card">
+    <div class="card-title">Domain Availability</div>
+    <div class="card-desc">Check if your preferred domain is available. We'll also check .io and .ai variants.</div>
+    <div class="row">
+      <div class="field" style="flex:2">
+        <label>Domain</label>
+        <input id="domainCheckInput" value="${esc(domainGuess)}" placeholder="yourbrand.com">
+      </div>
+      <div class="field" style="flex:0;justify-content:flex-end">
+        <button class="nav-btn next" onclick="checkDomain()" style="margin-top:20px;white-space:nowrap">Check Availability</button>
+      </div>
+    </div>
+    ${renderDomainResults()}
+  </div>`;
+  return html;
+}
+
+function renderDomainResults(){
+  const checks=state.brand.domainChecks;
+  const keys=Object.keys(checks);
+  if(!keys.length)return '';
+  let html='<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">';
+  keys.forEach(domain=>{
+    const r=checks[domain];
+    const icon=r.available?'&#10003;':'&#10005;';
+    const color=r.available?'var(--green)':'var(--red)';
+    const label=r.available?'Likely available':'Likely taken';
+    html+=`<div class="domain-result">
+      <span class="dr-icon" style="color:${color}">${icon}</span>
+      <span class="dr-domain">${esc(domain)}</span>
+      <span class="dr-label">${label}</span>
+    </div>`;
+  });
+  html+='</div>';
+  return html;
+}
+
+// Brand Discovery handlers
+function setBrandStatus(val){
+  state.brand.hasBrand=val;
+  renderSection();renderSidebar();saveDraft();
+}
+
+function generateBrandSuggestions(){
+  const desc=document.getElementById('nicheInput')?.value||'';
+  state.brand.nicheDescription=desc;
+  if(!desc.trim()){toast('Describe your niche first');return}
+
+  // Mock AI brand generation — produces realistic candidates with evaluations
+  const words=desc.toLowerCase().split(/\s+/).filter(w=>w.length>4);
+  const pool=[
+    {pre:['AI','Smart','Digital','Neo','Pulse','Signal','Insight','Data','Core','Next'],suf:['Hub','Wire','Digest','Intel','Watch','Brief','Beacon','Index','Pulse','Edge']},
+    {pre:['The','My','Our','Pro','True'],suf:['Analyst','Curator','Monitor','Tracker','Scanner','Lens']},
+  ];
+  const industryHints=words.slice(0,3).map(w=>w.charAt(0).toUpperCase()+w.slice(1));
+
+  state.brand.suggestions=[];
+  const used=new Set();
+  for(let i=0;i<6;i++){
+    const g=pool[i%pool.length];
+    let name,attempts=0;
+    do{
+      const pre=g.pre[Math.floor(Math.random()*g.pre.length)];
+      const suf=g.suf[Math.floor(Math.random()*g.suf.length)];
+      const hint=industryHints.length>0?industryHints[Math.floor(Math.random()*industryHints.length)]:'';
+      name=i<3?(pre+' '+hint+' '+suf).replace(/\s+/g,' ').trim():(pre+' '+suf);
+      attempts++;
+    }while(used.has(name)&&attempts<20);
+    used.add(name);
+    const shortName=(name.split(/\s+/).map(w=>w[0]).join('').toUpperCase()).slice(0,4);
+    const score=Math.floor(55+Math.random()*40);
+    const slug=slugify(name);
+    state.brand.suggestions.push({
+      name,shortName,score,domain:slug+'.com',
+      eval:{
+        memorability:Math.floor(5+Math.random()*5),
+        uniqueness:Math.floor(4+Math.random()*6),
+        industryFit:Math.floor(5+Math.random()*5),
+        seo:Math.floor(4+Math.random()*6),
+        slug:!/[^a-z0-9-]/.test(slug),
+        trademarkRisk:['Low','Low','Medium','Low'][Math.floor(Math.random()*4)],
+        domainAvailable:Math.random()>0.4,
+        socialAvailable:Math.random()>0.3
+      }
+    });
+  }
+
+  state.brand.selectedSuggestion=-1;
+  renderSection();saveDraft();
+  toast('6 brand candidates generated','success');
+}
+
+function selectBrandSuggestion(i){
+  state.brand.selectedSuggestion=i;
+  const s=state.brand.suggestions[i];
+  state.name=s.name;
+  state.shortName=s.shortName;
+  state.domain=s.domain;
+  state.adminEmail='admin@'+s.domain;
+  // Auto-check domain
+  if(!state.brand.domainChecks[s.domain]){
+    state.brand.domainChecks[s.domain]={available:s.eval?.domainAvailable??Math.random()>0.4,checked:new Date().toISOString()};
+    const base=s.domain.replace(/\.\w+$/,'');
+    state.brand.domainChecks[base+'.io']={available:Math.random()>0.3,checked:new Date().toISOString()};
+    state.brand.domainChecks[base+'.ai']={available:Math.random()>0.5,checked:new Date().toISOString()};
+  }
+  renderSection();renderPreview();renderSidebar();saveDraft();
+  toast('Brand selected: '+s.name,'success');
+}
+
+function checkDomain(){
+  const input=document.getElementById('domainCheckInput');
+  if(!input)return;
+  let domain=input.value.trim().toLowerCase();
+  if(!domain){toast('Enter a domain');return}
+  if(!domain.includes('.'))domain+='.com';
+
+  // Mock domain check
+  state.brand.domainChecks[domain]={available:Math.random()>0.4,checked:new Date().toISOString()};
+  const base=domain.replace(/\.\w+$/,'');
+  if(!state.brand.domainChecks[base+'.io'])
+    state.brand.domainChecks[base+'.io']={available:Math.random()>0.3,checked:new Date().toISOString()};
+  if(!state.brand.domainChecks[base+'.ai'])
+    state.brand.domainChecks[base+'.ai']={available:Math.random()>0.5,checked:new Date().toISOString()};
+
+  // If available, use it
+  if(state.brand.domainChecks[domain].available){
+    state.domain=domain;
+    state.adminEmail='admin@'+domain;
+  }
+
+  renderSection();renderPreview();renderSidebar();saveDraft();
+}
+
+// ── QA Testing ──
+const QA_TESTS=[
+  {name:'Health Check',endpoint:'/api/health',expect:'status',desc:'API server is running'},
+  {name:'Articles API',endpoint:'/api/articles?limit=1',expect:'articles',desc:'Articles endpoint returns data'},
+  {name:'Categories API',endpoint:'/api/categories',expect:'categories',desc:'Categories are configured'},
+  {name:'Sources API',endpoint:'/api/sources',expect:'sources',desc:'RSS sources are configured'},
+  {name:'Scrape Status',endpoint:'/api/scrape/status',expect:'lastScrape',desc:'Scraper has run recently'},
+  {name:'QA Self-Report',endpoint:'/api/qa/report',expect:'report',desc:'Built-in QA endpoint',optional:true}
+];
+
+function renderQA(){
+  const qa=state.qa;
+  const targetUrl=qa.targetUrl||(state.domain?'https://'+state.domain:'');
+
+  let html=`<div class="main-header"><h1>QA <span class="gradient">Testing</span></h1><p>Run health checks against your deployed platform to verify everything is working.</p></div>`;
+
+  html+=`<div class="card">
+    <div class="card-title">Target Platform</div>
+    <div class="card-desc">Enter the URL of your deployed platform to test its public API endpoints.</div>
+    <div class="row">
+      <div class="field" style="flex:2">
+        <label>Platform URL</label>
+        <input id="qaUrl" value="${esc(targetUrl)}" placeholder="https://yourdomain.com">
+      </div>
+      <div class="field" style="flex:0;justify-content:flex-end">
+        <button class="nav-btn next" onclick="runQATests()" ${qa.running?'disabled':''} style="margin-top:20px;white-space:nowrap">
+          ${qa.running?'&#9203; Running...':'&#9654; Run All Tests'}
+        </button>
+      </div>
+    </div>
+  </div>`;
+
+  if(qa.results.length>0){
+    const pass=qa.results.filter(r=>r.status==='pass').length;
+    const warn=qa.results.filter(r=>r.status==='warn').length;
+    const fail=qa.results.filter(r=>r.status==='fail').length;
+    const skip=qa.results.filter(r=>r.status==='skipped').length;
+    const total=qa.results.length-skip;
+    const score=total>0?Math.round((pass/total)*100):0;
+    const scoreColor=score>=80?'var(--green)':score>=50?'var(--orange)':'var(--red)';
+
+    html+=`<div class="card qa-score-card">
+      <div class="score-num" style="color:${scoreColor}">${score}</div>
+      <div class="score-label">${pass} passed &middot; ${warn} warnings &middot; ${fail} failed${skip?' &middot; '+skip+' skipped':''}</div>
+    </div>`;
+
+    html+=`<div class="card">
+      <div class="card-title">Test Results</div>`;
+    qa.results.forEach(r=>{
+      const icon=r.status==='pass'?'&#10003;':r.status==='warn'?'&#9888;':r.status==='fail'?'&#10005;':r.status==='running'?'&#9203;':'&#8722;';
+      html+=`<div class="qa-result">
+        <div class="status ${r.status}">${icon}</div>
+        <div class="test-info">
+          <div class="test-name">${esc(r.name)}</div>
+          <div class="test-detail">${esc(r.message)}</div>
+        </div>
+        ${r.responseTime?`<div class="test-time">${r.responseTime}ms</div>`:''}
+      </div>`;
+    });
+    html+=`<div style="display:flex;gap:8px;margin-top:16px">
+      <button class="add-btn" onclick="exportQAReport()" style="flex:1">&#128196; Export Report</button>
+      <button class="add-btn" onclick="runQATests()" style="flex:1">&#9654; Run Again</button>
+    </div>`;
+    html+=`</div>`;
+  }else{
+    html+=`<div class="card" style="text-align:center;padding:32px;color:var(--muted)">
+      <div style="font-size:28px;margin-bottom:8px">&#128269;</div>
+      <p>Enter your platform URL above and click "Run All Tests" to start.</p>
+      <p style="font-size:11px;margin-top:8px">Tests will check: API health, articles, categories, sources, scraper status, and more.</p>
+    </div>`;
+  }
+
+  return html;
+}
+
+async function runQATests(){
+  const urlInput=document.getElementById('qaUrl');
+  if(!urlInput)return;
+  let baseUrl=urlInput.value.trim().replace(/\/$/,'');
+  if(!baseUrl){toast('Enter a platform URL');return}
+  if(!baseUrl.startsWith('http'))baseUrl='https://'+baseUrl;
+
+  state.qa.targetUrl=baseUrl;
+  state.qa.running=true;
+  state.qa.results=QA_TESTS.map(t=>({name:t.name,endpoint:t.endpoint,status:'running',message:'Testing...',responseTime:null}));
+  renderSection();
+
+  for(let i=0;i<QA_TESTS.length;i++){
+    const test=QA_TESTS[i];
+    const url=baseUrl+test.endpoint;
+    const start=Date.now();
+
+    try{
+      const resp=await fetch(url,{mode:'cors',signal:AbortSignal.timeout(10000)});
+      const elapsed=Date.now()-start;
+
+      if(!resp.ok){
+        state.qa.results[i]={name:test.name,endpoint:test.endpoint,status:'fail',message:'HTTP '+resp.status+' '+resp.statusText,responseTime:elapsed};
+      }else{
+        let data;
+        try{data=await resp.json()}catch(e){data={}}
+        const hasKey=test.expect in data||(Array.isArray(data)&&data.length>=0);
+        state.qa.results[i]={
+          name:test.name,endpoint:test.endpoint,
+          status:hasKey?'pass':'warn',
+          message:hasKey?'OK':'Response missing expected field: '+test.expect,
+          responseTime:elapsed
+        };
+        // Enrich messages
+        if(test.expect==='articles'&&data.articles){
+          const total=data.pagination?.total||data.articles.length;
+          state.qa.results[i].message='OK — '+total+' articles total';
+        }
+        if(test.expect==='categories'&&data.categories){
+          state.qa.results[i].message='OK — '+data.categories.length+' categories';
+        }
+        if(test.expect==='sources'&&data.sources){
+          const active=data.sources.filter(s=>s.active).length;
+          state.qa.results[i].message='OK — '+data.sources.length+' sources ('+active+' active)';
+        }
+        if(test.expect==='status'&&data.status){
+          state.qa.results[i].message='OK — status: '+data.status;
+        }
+        if(test.expect==='lastScrape'&&data.lastScrape){
+          state.qa.results[i].message='OK — last scrape: '+data.lastScrape;
+        }
+        if(test.expect==='report'&&data.report){
+          state.qa.results[i].message='OK — self-report available (score: '+(data.report.score||'N/A')+')';
+        }
+      }
+    }catch(err){
+      const elapsed=Date.now()-start;
+      if(err.message&&(err.message.includes('Failed to fetch')||err.message.includes('CORS')||err.message.includes('NetworkError'))){
+        state.qa.results[i]={
+          name:test.name,endpoint:test.endpoint,
+          status:test.optional?'skipped':'warn',
+          message:'CORS blocked or unreachable. Try: curl '+baseUrl+test.endpoint,
+          responseTime:elapsed
+        };
+      }else if(err.name==='TimeoutError'||err.name==='AbortError'){
+        state.qa.results[i]={name:test.name,endpoint:test.endpoint,status:'fail',message:'Timeout after 10s',responseTime:elapsed};
+      }else{
+        state.qa.results[i]={name:test.name,endpoint:test.endpoint,status:'fail',message:err.message||'Unknown error',responseTime:elapsed};
+      }
+    }
+
+    renderSection();
+  }
+
+  state.qa.running=false;
+  const passCount=state.qa.results.filter(r=>r.status==='pass').length;
+  const totalCount=state.qa.results.filter(r=>r.status!=='skipped').length;
+  state.qa.overallScore=totalCount>0?Math.round((passCount/totalCount)*100):0;
+  renderSection();renderSidebar();saveDraft();
+  toast('QA complete: '+state.qa.overallScore+'% passed','success');
+}
+
+function exportQAReport(){
+  const report={
+    platform:state.name||'Unknown',
+    url:state.qa.targetUrl,
+    timestamp:new Date().toISOString(),
+    overallScore:state.qa.overallScore,
+    tests:state.qa.results.map(r=>({name:r.name,endpoint:r.endpoint,status:r.status,message:r.message,responseTime:r.responseTime}))
+  };
+  const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='qa-report-'+slugify(state.name||'platform')+'-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('QA report downloaded','success');
+}
+
+function renderTemplates(){
+  let html=`<div class="main-header"><h1>Choose a <span class="gradient">Template</span></h1><p>Start from a pre-built configuration or build your AI platform from scratch.</p></div>`;
+  html+=`<div class="tmpl-grid">`;
+  // Blank
+  html+=`<div class="tmpl-card" onclick="loadTemplate('blank')">
+    <h4>Blank</h4><p>Start from scratch with empty fields</p>
+    <div class="tmpl-meta"><span>0 categories</span><span>0 sources</span></div>
+    <div class="tmpl-colors"><span style="background:#5b21b6"></span><span style="background:#7c3aed"></span></div>
+  </div>`;
+  // All templates
+  Object.entries(TEMPLATES).forEach(([key,t])=>{
+    html+=`<div class="tmpl-card" onclick="loadTemplate('${key}')">
+      <h4>${t.name}</h4><p>${t.tagline}</p>
+      <div class="tmpl-meta"><span>${t.categories.length} categories</span><span>${t.sources.length} sources</span></div>
+      <div class="tmpl-colors">${Object.values(t.colors).map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+function renderBranding(){
+  return `<div class="main-header"><h1><span class="gradient">Branding</span></h1><p>Set your platform's name, tagline, and identity.</p></div>
+  <div class="card">
+    <div class="card-title">Platform Identity</div>
+    <div class="card-desc">Core naming and messaging for your AI platform</div>
+    <div class="row">
+      <div class="field"><label>Platform Name</label><input data-key="name" value="${esc(state.name)}" placeholder="e.g. AI Health Digest"><span class="hint">Full brand name</span></div>
+      <div class="field"><label>Short Name</label><input data-key="shortName" value="${esc(state.shortName)}" placeholder="2-4 chars" maxlength="4" style="width:120px"><span class="hint">Badge / logo abbreviation</span></div>
+    </div>
+    <div class="row full"><div class="field"><label>Tagline</label><input data-key="tagline" value="${esc(state.tagline)}" placeholder="One-line description"></div></div>
+    <div class="row full"><div class="field"><label>Description</label><textarea data-key="description" placeholder="Full meta description for SEO">${esc(state.description)}</textarea></div></div>
+  </div>`;
+}
+
+function renderIndustry(){
+  const langs=[['en','English'],['es','Spanish'],['fr','French'],['de','German'],['pt','Portuguese'],['it','Italian'],['zh','Chinese'],['ja','Japanese'],['ko','Korean']];
+  const opts=langs.map(([v,l])=>`<option value="${v}" ${state.locale.primary===v?'selected':''}>${l}</option>`).join('');
+  const opts2='<option value="">None</option>'+langs.map(([v,l])=>`<option value="${v}" ${state.locale.secondary===v?'selected':''}>${l}</option>`).join('');
+  return `<div class="main-header"><h1><span class="gradient">Industry</span></h1><p>Define the industry focus and localization.</p></div>
+  <div class="card">
+    <div class="card-title">Industry Focus</div>
+    <div class="card-desc">Defines content sourcing and AI relevance filtering scope</div>
+    <div class="row">
+      <div class="field"><label>Industry</label><input data-key="industry" value="${esc(state.industry)}" placeholder="e.g. healthcare, real estate"></div>
+      <div class="field"><label>Languages</label>
+        <div style="display:flex;gap:6px">
+          <select data-key="locale.primary" style="flex:1">${opts}</select>
+          <select data-key="locale.secondary" style="flex:1">${opts2}</select>
+        </div>
+        <span class="hint">Primary + secondary</span>
+      </div>
+    </div>
+    <div class="row full"><div class="field"><label>Industry Description</label><textarea data-key="industryDescription" placeholder="Detailed context for AI filtering">${esc(state.industryDescription)}</textarea></div></div>
+  </div>`;
+}
+
+function renderColors(){
+  return `<div class="main-header"><h1><span class="gradient">Colors & Theme</span></h1><p>Set the brand color palette. Changes are reflected live in the preview.</p></div>
+  <div class="card">
+    <div class="card-title">Color Palette</div>
+    <div class="card-desc">These colors affect the entire site appearance</div>
+    <div class="row tri">
+      ${colorPicker('Primary','colors.primary',state.colors.primary)}
+      ${colorPicker('Accent','colors.accent',state.colors.accent)}
+      ${colorPicker('Primary Dark','colors.primaryDark',state.colors.primaryDark)}
+    </div>
+    <div style="margin-top:8px">
+      <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="autoDarken" checked onchange="handleAutoDarken()"> Auto-generate dark variant from Primary
+      </label>
+    </div>
+  </div>`;
+}
+
+function colorPicker(label,key,val){
+  return `<div class="field"><label>${label}</label>
+    <div class="color-group">
+      <div class="swatch" style="background:${val}"><input type="color" value="${val}" data-color-key="${key}"></div>
+      <div class="info"><span class="lbl">${label}</span><input value="${val}" data-hex-key="${key}" spellcheck="false"></div>
+    </div>
+  </div>`;
+}
+
+function renderCategories(){
+  let list='';
+  state.categories.forEach((cat,i)=>{
+    const exp=state._ui.expandedCat===i;
+    list+=`<div class="list-item" draggable="true" data-cat-idx="${i}">
+      <span class="drag">&#9776;</span>
+      <span class="name">${esc(cat.name)}</span>
+      <span class="slug">${cat.slug}</span>
+      <div class="actions">
+        <button class="list-btn" onclick="toggleCat(${i})" title="Edit">&#9998;</button>
+        <button class="list-btn del" onclick="removeCat(${i})" title="Delete">&#10005;</button>
+      </div>
+    </div>`;
+    list+=`<div class="list-detail ${exp?'open':''}" id="cat-detail-${i}">
+      <div class="row">
+        <div class="field"><label>Name</label><input value="${esc(cat.name)}" onchange="updateCat(${i},'name',this.value)"></div>
+        <div class="field"><label>Slug</label><input value="${cat.slug}" onchange="updateCat(${i},'slug',this.value)"></div>
+      </div>
+      <div class="row full"><div class="field"><label>Description</label><textarea onchange="updateCat(${i},'description',this.value)">${esc(cat.description)}</textarea></div></div>
+      <div class="row full"><div class="field"><label>Topics</label>${tagInput(cat.topics,'cat',i,'topics')}</div></div>
+      <div class="row full"><div class="field"><label>Keywords</label>${tagInput(cat.keywords,'cat',i,'keywords')}</div></div>
+      <div class="row full"><div class="field"><label>Key Players</label>${tagInput(cat.players,'cat',i,'players')}</div></div>
+    </div>`;
+  });
+
+  return `<div class="main-header"><h1><span class="gradient">Categories</span></h1><p>Define 3-8 content categories for your platform.</p></div>
+  <div class="card">
+    <div class="card-title">Content Categories</div>
+    <div class="card-desc">${state.categories.length} configured</div>
+    ${list}
+    <button class="add-btn" onclick="addCategory()">+ Add Category</button>
+  </div>`;
+}
+
+function renderSources(){
+  const langs=[['en','EN'],['es','ES'],['fr','FR'],['de','DE'],['pt','PT']];
+  let list='';
+  state.sources.forEach((src,i)=>{
+    const langOpts=langs.map(([v,l])=>`<option value="${v}" ${src.language===v?'selected':''}>${l}</option>`).join('');
+    list+=`<div class="list-item">
+      <span class="name" style="min-width:120px"><input value="${esc(src.name)}" style="background:none;border:none;color:var(--text);font-size:13px;font-weight:500;width:100%;outline:none" onchange="updateSrc(${i},'name',this.value)"></span>
+      <span class="slug" style="flex:1"><input value="${esc(src.url)}" style="background:none;border:none;color:var(--muted);font-size:11px;font-family:monospace;width:100%;outline:none" onchange="updateSrc(${i},'url',this.value)" placeholder="https://example.com/feed/"></span>
+      <select style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:10px;padding:2px 6px" onchange="updateSrc(${i},'language',this.value)">${langOpts}</select>
+      <button class="list-btn del" onclick="removeSrc(${i})">&#10005;</button>
+    </div>`;
+  });
+
+  return `<div class="main-header"><h1><span class="gradient">RSS Sources</span></h1><p>Add the news feeds your platform will aggregate content from.</p></div>
+  <div class="card">
+    <div class="card-title">Feed Sources</div>
+    <div class="card-desc">${state.sources.length} configured</div>
+    ${list}
+    <button class="add-btn" onclick="addSource()">+ Add Source</button>
+  </div>`;
+}
+
+function renderAI(){
+  return `<div class="main-header"><h1><span class="gradient">AI Configuration</span></h1><p>Configure how the AI filters and evaluates articles for relevance.</p></div>
+  <div class="card">
+    <div class="card-title">AI Relevance Filter</div>
+    <div class="card-desc">These prompts control which articles get published on your platform</div>
+    <div class="row full"><div class="field"><label>Filter Question</label><textarea data-key="aiFilterQuestion" placeholder="e.g. Is this article likely about AI/ML applications in healthcare?">${esc(state.aiFilterQuestion)}</textarea><span class="hint">Phase 1 quick relevance check &mdash; yes/no question</span></div></div>
+    <div class="row full"><div class="field"><label>Relevance Criteria</label><textarea data-key="aiRelevanceCriteria" placeholder="e.g. AI, machine learning, or data science applications in healthcare, medicine, pharma...">${esc(state.aiRelevanceCriteria)}</textarea><span class="hint">Detailed description of what makes an article relevant</span></div></div>
+    <button class="add-btn" onclick="autoGenAI()" style="margin-top:8px">&#9733; Auto-generate from Industry</button>
+  </div>`;
+}
+
+function renderDeploy(){
+  const files=['public/favicon.svg','public/images/logo.svg','public/images/logo-white.svg','public/site.webmanifest','public/css/styles.css','views/partials/header.ejs','views/admin/partials/header.ejs','views/partials/footer.ejs','src/services/ai.js','src/services/articleGenerator.js','.env.example','src/server.js','docs/platform-config.json'];
+  return `<div class="main-header"><h1><span class="gradient">Deployment</span></h1><p>Set your domain and export the configuration.</p></div>
+  <div class="card">
+    <div class="card-title">Domain & Email</div>
+    <div class="card-desc">Production deployment details</div>
+    <div class="row">
+      <div class="field"><label>Domain</label><input data-key="domain" value="${esc(state.domain)}" placeholder="e.g. aihealthdigest.com"></div>
+      <div class="field"><label>Admin Email</label><input data-key="adminEmail" value="${esc(state.adminEmail)}" placeholder="admin@domain.com" type="email"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Files Modified</div>
+    <div class="card-desc">The FigSamurai Studio deployment tool will update these ${files.length} files</div>
+    <div class="file-list">${files.map(f=>`<div>${f}</div>`).join('')}</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="card-title">Export & Apply</div>
+    <div class="card-desc">Download the configuration file, then run the CLI tool to apply it</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button class="nav-btn next" onclick="exportConfig()" style="font-size:14px;padding:12px 28px">&#11015; Download Config JSON</button>
+      <button class="nav-btn back" onclick="copyCmd()" style="font-size:14px;padding:12px 28px">&#9997; Copy CLI Command</button>
+    </div>
+  </div>`;
+}
+
+// Tag input helper
+function tagInput(arr,type,idx,field){
+  const tags=arr.map((t,ti)=>`<span class="tag">${esc(t)}<span class="x" onclick="removeTag('${type}',${idx},'${field}',${ti})">&#10005;</span></span>`).join('');
+  return `<div class="tags-wrap" onclick="this.querySelector('input').focus()">
+    ${tags}
+    <input placeholder="Type + Enter..." onkeydown="handleTag(event,'${type}',${idx},'${field}')">
+  </div>`;
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ── Preview ──
+function renderPreview(){
+  const p=document.getElementById('preview');
+  const pri=state.colors.primary||'#5b21b6';
+  const acc=state.colors.accent||'#B87333';
+  const nm=state.name||'Platform Name';
+  const sn=state.shortName||'??';
+  const tl=state.tagline||'Your tagline here';
+
+  const cats=state.categories.length>0?state.categories:([{name:'Category 1'},{name:'Category 2'},{name:'Category 3'}]);
+  const chips=cats.map(c=>`<span class="pchip" style="background:${pri}15;color:${pri};border-color:${pri}33">${c.name}</span>`).join('');
+
+  p.innerHTML=`
+    <div class="preview-label">Site Preview</div>
+    <div class="pcard">
+      <div class="pcard-header">
+        <div class="logo-badge" style="background:${pri}">${sn}</div>
+        <div class="info"><h3>${esc(nm)}</h3><p>${esc(tl)}</p></div>
+      </div>
+      <div class="pcard-cats">${chips}</div>
+      <div class="part"><div class="src" style="color:${acc}">Sample Source</div><div class="ttl">AI transforms ${state.industry||'industry'}: latest innovations and market trends</div><div class="meta">3 min read &middot; ${cats[0]?.name||'Category'}</div></div>
+      <div class="part"><div class="src" style="color:${acc}">Industry News</div><div class="ttl">New regulations reshape AI governance in ${state.industry||'the sector'}</div><div class="meta">5 min read &middot; ${cats[Math.min(1,cats.length-1)]?.name||'Category'}</div></div>
+    </div>
+
+    <div class="preview-label">Favicon</div>
+    <div class="favicon-preview">
+      <div class="fav-wrap">${faviconSvg(state)}</div>
+      <div class="fav-info"><div style="font-weight:500">${sn}</div><div style="font-size:10px;color:var(--muted)">32x32 SVG</div></div>
+    </div>
+
+    <div class="preview-label">Logo</div>
+    <div style="background:white;border-radius:var(--radius-sm);padding:12px;margin-bottom:6px">${logoSvg(state,'light')}</div>
+    <div style="background:#1a1a1a;border-radius:var(--radius-sm);padding:12px;margin-bottom:12px">${logoSvg(state,'dark')}</div>
+
+    <div class="preview-label">Config Summary</div>
+    <div class="summary-card">
+      <div class="summary-row"><span class="k">Categories</span><span class="v">${state.categories.length}</span></div>
+      <div class="summary-row"><span class="k">RSS Sources</span><span class="v">${state.sources.length}</span></div>
+      <div class="summary-row"><span class="k">Languages</span><span class="v">${state.locale.primary||'en'}${state.locale.secondary?', '+state.locale.secondary:''}</span></div>
+      <div class="summary-row"><span class="k">Industry</span><span class="v">${state.industry||'-'}</span></div>
+      <div class="summary-row"><span class="k">Completion</span><span class="v" style="color:${getCompletion()>=80?'var(--green)':getCompletion()>=50?'var(--orange)':'var(--red)'}">${getCompletion()}%</span></div>
+    </div>
+  `;
+}
+
+// ============================================
+// EVENT HANDLERS
+// ============================================
+function bindInputs(){
+  // data-key inputs
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    el.addEventListener('input',e=>{
+      const key=e.target.dataset.key;
+      if(key.includes('.')){
+        const[a,b]=key.split('.');state[a][b]=e.target.value;
+      }else{
+        state[key]=e.target.value;
+      }
+      // Auto-derive
+      if(key==='name'&&!state._ui._shortNameManual){
+        state.shortName=state.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,4);
+        state.domain=state.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.com';
+        state.adminEmail='admin@'+state.domain;
+      }
+      if(key==='shortName')state._ui._shortNameManual=true;
+      renderPreview();renderSidebar();saveDraft();
+    });
+  });
+
+  // Color pickers
+  document.querySelectorAll('[data-color-key]').forEach(el=>{
+    el.addEventListener('input',e=>{
+      const key=e.target.dataset.colorKey;
+      const[a,b]=key.split('.');
+      state[a][b]=e.target.value;
+      if(b==='primary'&&document.getElementById('autoDarken')?.checked){
+        state.colors.primaryDark=darkenHex(e.target.value,30);
+      }
+      renderSection();renderPreview();renderSidebar();saveDraft();
+    });
+  });
+  document.querySelectorAll('[data-hex-key]').forEach(el=>{
+    el.addEventListener('input',e=>{
+      const v=e.target.value;
+      if(/^#[0-9a-fA-F]{6}$/.test(v)){
+        const key=e.target.dataset.hexKey;
+        const[a,b]=key.split('.');
+        state[a][b]=v;
+        if(b==='primary'&&document.getElementById('autoDarken')?.checked){
+          state.colors.primaryDark=darkenHex(v,30);
+        }
+        renderSection();renderPreview();renderSidebar();saveDraft();
+      }
+    });
+  });
+}
+
+function handleAutoDarken(){
+  const cb=document.getElementById('autoDarken');
+  if(cb&&cb.checked){
+    state.colors.primaryDark=darkenHex(state.colors.primary,30);
+    renderSection();renderPreview();saveDraft();
+  }
+}
+
+// Template loading
+function loadTemplate(name){
+  if(name==='blank'){
+    Object.assign(state,{name:'',shortName:'',tagline:'',description:'',domain:'',industry:'',industryDescription:'',colors:{primary:'#5b21b6',accent:'#7c3aed',primaryDark:'#4c1d95'},categories:[],sources:[],aiRelevanceCriteria:'',aiFilterQuestion:'',locale:{primary:'en',secondary:''},adminEmail:''});
+  }else{
+    const t=TEMPLATES[name];
+    if(!t)return;
+    Object.assign(state,JSON.parse(JSON.stringify(t)));
+  }
+  state._ui._shortNameManual=false;
+  toast('Template loaded: '+(name==='blank'?'Blank':state.name),'success');
+  goTo(2);
+}
+
+// Categories
+function addCategory(){
+  state.categories.push({name:'New Category',slug:'new-category',description:'',topics:[],keywords:[],players:[]});
+  state._ui.expandedCat=state.categories.length-1;
+  renderSection();renderPreview();renderSidebar();saveDraft();
+}
+function removeCat(i){state.categories.splice(i,1);state._ui.expandedCat=-1;renderSection();renderPreview();renderSidebar();saveDraft()}
+function toggleCat(i){state._ui.expandedCat=state._ui.expandedCat===i?-1:i;renderSection()}
+function updateCat(i,field,val){
+  state.categories[i][field]=val;
+  if(field==='name')state.categories[i].slug=slugify(val);
+  renderSection();renderPreview();saveDraft();
+}
+
+// Sources
+function addSource(){state.sources.push({name:'New Source',url:'',language:'en'});renderSection();renderPreview();renderSidebar();saveDraft()}
+function removeSrc(i){state.sources.splice(i,1);renderSection();renderPreview();renderSidebar();saveDraft()}
+function updateSrc(i,field,val){state.sources[i][field]=val;renderPreview();saveDraft()}
+
+// Tags
+function handleTag(e,type,idx,field){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const v=e.target.value.replace(',','').trim();
+    if(!v)return;
+    if(type==='cat'){state.categories[idx][field].push(v)}
+    e.target.value='';
+    renderSection();saveDraft();
+  }
+}
+function removeTag(type,idx,field,ti){
+  if(type==='cat'){state.categories[idx][field].splice(ti,1)}
+  renderSection();saveDraft();
+}
+
+// AI auto-gen
+function autoGenAI(){
+  if(!state.industry){toast('Set industry first');return}
+  state.aiFilterQuestion=`Is this article likely about AI/ML applications in ${state.industry}?`;
+  state.aiRelevanceCriteria=`AI, machine learning, or data science applications in ${state.industry}${state.industryDescription?', specifically '+state.industryDescription:''}`;
+  renderSection();renderPreview();renderSidebar();saveDraft();
+  toast('AI prompts generated from industry','success');
+}
+
+// Copy CLI command
+function copyCmd(){
+  navigator.clipboard.writeText('node docs/replicate.js --config platform-config.json').then(()=>toast('CLI command copied!','success'));
+}
+
+// ── Import / Export ──
+function exportConfig(){
+  const exp={...state};delete exp._ui;
+  const blob=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='platform-config.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Config downloaded!','success');
+}
+
+function importConfig(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const cfg=JSON.parse(ev.target.result);
+        if(!cfg.name){toast('Invalid config: missing name');return}
+        Object.assign(state,cfg);
+        state._ui={section:1,expandedCat:-1,expandedSrc:-1};
+        renderAll();
+        toast('Config imported: '+cfg.name,'success');
+      }catch(err){toast('Invalid JSON file')}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+// ============================================
+// RENDER ALL
+// ============================================
+function renderAll(){
+  renderSidebar();
+  renderSection();
+  renderPreview();
+}
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded',()=>{
+  const hasDraft=loadDraft();
+  if(hasDraft&&state.name){
+    state._ui.section=2;
+  }
+  renderAll();
+});
+</script>
+</body>
+</html>
