@@ -538,9 +538,20 @@
   }
 
   /* ===== MARKDOWN RENDERING ===== */
-  .msg-body h3 {
+  .msg-body h2 {
     font-size: 14px;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    margin: 18px 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .msg-body h3 {
+    font-size: 13px;
+    font-weight: 600;
     margin: 14px 0 6px;
     color: var(--text);
   }
@@ -566,6 +577,80 @@
     border: none;
     border-top: 1px solid var(--border);
     margin: 16px 0;
+  }
+
+  /* ===== COLLAPSIBLE SECTIONS ===== */
+  .msg-section {
+    margin: 10px 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .msg-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .msg-section-header:hover {
+    background: var(--bg-hover);
+  }
+
+  .msg-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .msg-section-toggle {
+    font-size: 10px;
+    color: var(--text-subtle);
+    transition: transform 0.2s;
+  }
+
+  .msg-section.open .msg-section-toggle {
+    transform: rotate(180deg);
+  }
+
+  .msg-section-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .msg-section.open .msg-section-body {
+    max-height: 2000px;
+  }
+
+  .msg-section-body-inner {
+    padding: 10px 14px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .msg-section-body-inner p { margin-bottom: 8px; }
+  .msg-section-body-inner p:last-child { margin-bottom: 0; }
+  .msg-section-body-inner strong { color: var(--text); }
+  .msg-section-body-inner ul { padding-left: 18px; margin-bottom: 8px; }
+  .msg-section-body-inner li { margin-bottom: 3px; }
+
+  /* Summary line shown when collapsed */
+  .msg-section-summary {
+    padding: 0 14px 10px;
+    font-size: 12px;
+    color: var(--text-subtle);
+    line-height: 1.5;
+  }
+
+  .msg-section.open .msg-section-summary {
+    display: none;
   }
 
   /* Deliverable notification */
@@ -1135,7 +1220,17 @@ function renderMarkdown(text) {
   // Strip deliverable code blocks and replace with notice
   text = text.replace(/```html-deliverable\n[\s\S]*?```/g, '%%DELIVERABLE%%');
 
-  // Basic markdown rendering
+  // Check if this is a long response with ## sections — make them collapsible
+  const hasSections = (text.match(/^## /gm) || []).length >= 2;
+
+  if (hasSections) {
+    return renderWithSections(text);
+  }
+
+  return renderBasicMarkdown(text);
+}
+
+function renderBasicMarkdown(text) {
   let html = escapeHtml(text);
 
   // Bold
@@ -1144,7 +1239,9 @@ function renderMarkdown(text) {
   html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
   // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // Headers
+  // H2 headers
+  html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+  // H3 headers
   html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
   // Horizontal rules
   html = html.replace(/^---$/gm, '<hr>');
@@ -1160,18 +1257,71 @@ function renderMarkdown(text) {
   // Paragraphs
   html = html.replace(/\n\n/g, '</p><p>');
   html = '<p>' + html + '</p>';
-  // Clean up empty paragraphs and misplaced tags
+  // Clean up
   html = html.replace(/<p><\/p>/g, '');
-  html = html.replace(/<p>(<h3>)/g, '$1');
-  html = html.replace(/(<\/h3>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<h[23]>)/g, '$1');
+  html = html.replace(/(<\/h[23]>)<\/p>/g, '$1');
   html = html.replace(/<p>(<ul>)/g, '$1');
   html = html.replace(/(<\/ul>)<\/p>/g, '$1');
   html = html.replace(/<p>(<hr>)<\/p>/g, '$1');
   html = html.replace(/<p>(<blockquote>)/g, '$1');
   html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
 
-  // Replace deliverable placeholder with styled notice
-  html = html.replace(/%%DELIVERABLE%%/g, `
+  html = addDeliverableNotice(html);
+  return html;
+}
+
+function renderWithSections(text) {
+  // Split into intro + sections
+  const parts = text.split(/^## /gm);
+  const intro = parts[0].trim();
+  const sections = parts.slice(1);
+
+  let html = '';
+
+  // Render intro (text before first ## section) as regular markdown
+  if (intro) {
+    html += renderBasicMarkdown(intro);
+  }
+
+  // Render each ## section as a collapsible block
+  sections.forEach((section, i) => {
+    const lines = section.split('\n');
+    const title = lines[0].trim();
+    const body = lines.slice(1).join('\n').trim();
+
+    // Get first sentence or line as summary
+    const firstLine = body.split('\n').find(l => l.trim() && !l.trim().startsWith('#')) || '';
+    const summary = firstLine.replace(/\*\*/g, '').replace(/\*/g, '').substring(0, 120);
+
+    const bodyHtml = renderBasicMarkdown(body);
+    const sectionId = 'section-' + Date.now() + '-' + i;
+
+    html += `
+      <div class="msg-section" id="${sectionId}">
+        <div class="msg-section-header" onclick="toggleSection('${sectionId}')">
+          <span class="msg-section-title">${escapeHtml(title).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>
+          <span class="msg-section-toggle">▼</span>
+        </div>
+        ${summary ? `<div class="msg-section-summary">${escapeHtml(summary)}${summary.length >= 120 ? '...' : ''}</div>` : ''}
+        <div class="msg-section-body">
+          <div class="msg-section-body-inner">${bodyHtml}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  html = addDeliverableNotice(html);
+  return html;
+}
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+function addDeliverableNotice(html) {
+  return html.replace(/%%DELIVERABLE%%/g, `
     <div class="deliverable-notice">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -1182,8 +1332,6 @@ function renderMarkdown(text) {
       Deliverable generated — see Preview panel
     </div>
   `);
-
-  return html;
 }
 
 // ===== EVENT LISTENERS =====
