@@ -343,6 +343,29 @@
     color: var(--text-subtle);
   }
 
+  .mode-indicator {
+    display: flex;
+    gap: 4px;
+  }
+
+  .mode-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-subtle);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .mode-pill.active {
+    background: var(--accent-soft);
+    border-color: rgba(166, 124, 82, 0.3);
+    color: var(--accent);
+  }
+  .mode-pill:hover { border-color: var(--border-light); color: var(--text-muted); }
+
   /* ===== PREVIEW PANEL ===== */
   .preview-panel {
     width: 48%;
@@ -664,6 +687,11 @@
       </div>
       <div class="input-meta">
         <span class="input-hint">Enter to send &middot; Shift+Enter for new line</span>
+        <div class="mode-indicator">
+          <button class="mode-pill" onclick="setMode('quick', this)" title="Fast and direct — get it done">Quick</button>
+          <button class="mode-pill active" onclick="setMode('guided', this)" title="Step by step, with your input">Guided</button>
+          <button class="mode-pill" onclick="setMode('thorough', this)" title="Deep analysis, every detail">Thorough</button>
+        </div>
       </div>
     </div>
   </div>
@@ -699,6 +727,7 @@
 let USER_NAME = '';
 let conversationHistory = [];
 let systemPrompt = '';
+let currentMode = 'guided';
 let isStreaming = false;
 
 // ===== SETUP =====
@@ -723,6 +752,9 @@ async function startSession() {
 
   // Add context about available tools and capabilities
   systemPrompt += `\n\n## Tools available in this session\n\nYou have access to a web_fetch tool. When the user shares a website URL, the platform will automatically fetch the page HTML and provide it to you as context. You can then analyze the site for technology stack, content, structure, SEO signals, and more.\n\nThe user's name is: ${USER_NAME}\n\n## Generating visual output\n\nYou can generate TWO types of visual output that render live in the Preview panel:\n\n### 1. Deliverables (documents for the client)\nOne-pagers, full documents, email pitches, slide decks. Output the COMPLETE HTML inside a code block with the language tag \`\`\`html-deliverable. Requirements:\n- Self-contained with all CSS inline or in a <style> block\n- Use A4 dimensions (210mm x 297mm) for print-ready documents\n- Print-ready CSS (@page, print-color-adjust)\n- Import fonts from Google Fonts CDN\n- The deliverable must be COMPLETE and BEAUTIFUL — this is the user's output for their client\n- Include the attribution line at the bottom: "Preparado por ${USER_NAME} · Powered by FigStudio"\n\n### 2. Website mockups (visual design previews)\nWhen the user wants to see what the new or improved website could look like, generate a FULL HTML page that serves as a visual mockup. Use the same \`\`\`html-deliverable code block — the Preview panel will render it identically.\n\nFor website mockups:\n- Build a complete, realistic-looking page — not a wireframe. It should look like a real website.\n- Use modern design patterns, clean typography, good spacing\n- Include placeholder content that matches the client's actual business (real service names, realistic copy, appropriate imagery via placeholder services or CSS gradients/shapes)\n- Make it responsive-looking within the preview\n- Use the client's actual brand colors if known, or propose a professional palette\n- Include all key sections: hero, services, reviews/trust signals, contact, footer\n- The user can ask for different styles, variations, or specific changes — each new version replaces the previous one in Preview\n- This is NOT the final website — it's a visual concept to help the user and their client align on direction before building\n\nThe mockup capability is powerful: the user can say "show me what the new homepage could look like" and you produce a complete visual design in seconds. They can then iterate: "make it more modern", "try a different color scheme", "add a reviews section." Each iteration renders live.`;
+
+  // Add mode behavior instructions
+  systemPrompt += getModeInstructions();
 
   // Opening message — Refine-first, concrete, value-forward
   addMessage('assistant', getOpeningMessage());
@@ -873,7 +905,11 @@ async function sendMessage() {
 
 // ===== CLAUDE API (via backend proxy) =====
 async function callClaude(messages) {
-  const currentSystem = systemPrompt;
+  // Inject current mode behavior into system prompt
+  let currentSystem = systemPrompt.replace(
+    /\n## Current mode\n[\s\S]*$/,
+    getModeInstructions()
+  );
 
   const resp = await fetch('/api/chat', {
     method: 'POST',
@@ -1054,6 +1090,22 @@ function exportPDF() {
     return;
   }
   iframe.contentWindow.print();
+}
+
+// ===== MODE SELECTION =====
+function getModeInstructions() {
+  const modes = {
+    quick: `\n## Current mode\nThe user selected **Quick** mode. They want SPEED and DIRECTNESS.\n- Be concise. Short paragraphs, no fluff.\n- Skip the preamble — go straight to the answer or action.\n- If they share a URL, give the top 3–5 issues and a recommendation, not a 20-point audit.\n- Deliver the document/mockup fast. Don't ask "shall I proceed?" — just do it.\n- Only ask questions if something is truly ambiguous. Otherwise, make smart assumptions and move.\n- Think: busy professional who wants results NOW.`,
+    guided: `\n## Current mode\nThe user selected **Guided** mode (default). Balance depth with collaboration.\n- Explain your reasoning, but stay focused.\n- Ask for input at key decision points (design direction, priority choices, pricing strategy).\n- Provide enough context so the user learns, but don't over-explain.\n- When generating deliverables, present the plan first, then build.\n- Think: collaborative working session where both parties contribute.`,
+    thorough: `\n## Current mode\nThe user selected **Thorough** mode. They want DEPTH and COMPLETENESS.\n- Go deep on analysis. Cover every angle.\n- Include detailed breakdowns: tech stack, SEO, content, UX, accessibility, competitive positioning.\n- In documents, add data points, comparisons, before/after sections, and "why this matters" for every recommendation.\n- Don't rush. Take the time to be comprehensive.\n- When generating mockups, add more sections, more polish, more detail.\n- Ask clarifying questions to make sure nothing is missed.\n- Think: perfectionist who values quality over speed.`
+  };
+  return modes[currentMode] || modes.guided;
+}
+
+function setMode(mode, el) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
 }
 
 // ===== HELPERS =====
