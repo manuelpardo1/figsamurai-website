@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FigSamurai · Studio</title>
+<title>FigStudio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
 <style>
@@ -343,29 +343,6 @@
     color: var(--text-subtle);
   }
 
-  .mode-indicator {
-    display: flex;
-    gap: 4px;
-  }
-
-  .mode-pill {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text-subtle);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-  }
-  .mode-pill.active {
-    background: var(--accent-soft);
-    border-color: rgba(166, 124, 82, 0.3);
-    color: var(--accent);
-  }
-  .mode-pill:hover { border-color: var(--border-light); color: var(--text-muted); }
-
   /* ===== PREVIEW PANEL ===== */
   .preview-panel {
     width: 48%;
@@ -633,16 +610,16 @@
           <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
         </svg>
       </div>
-      <span class="logo-text">Fig<span>Samurai</span></span>
+      <span class="logo-text">Fig<span>Studio</span></span>
     </div>
     <h2>Welcome</h2>
-    <p class="setup-subtitle">FigStudio helps you build, refine, and sell digital products. Tell me your name and let's get to work.</p>
+    <p class="setup-subtitle">Your AI-powered platform configurator. Tell me your name and let's get to work.</p>
     <div class="setup-field">
       <label>Your name</label>
       <input type="text" id="userNameInput" placeholder="Your name" autocomplete="off" autofocus>
     </div>
     <button class="setup-start" id="setupStart" onclick="startSession()">Start</button>
-    <div class="setup-note">Private beta &middot; FigSamurai Studio</div>
+    <div class="setup-note">Private beta &middot; FigStudio by FigSamurai</div>
   </div>
 </div>
 
@@ -658,10 +635,10 @@
         <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
       </svg>
     </div>
-    <span class="logo-text">Fig<span>Samurai</span></span>
+    <span class="logo-text">Fig<span>Studio</span></span>
     <div class="topbar-status">
       <span class="status-dot"></span>
-      Studio
+      Online
     </div>
   </div>
   <div class="topbar-right">
@@ -687,11 +664,6 @@
       </div>
       <div class="input-meta">
         <span class="input-hint">Enter to send &middot; Shift+Enter for new line</span>
-        <div class="mode-indicator">
-          <button class="mode-pill" onclick="setMode('autopilot', this)">Autopilot</button>
-          <button class="mode-pill active" onclick="setMode('navigator', this)">Navigator</button>
-          <button class="mode-pill" onclick="setMode('deep-dive', this)">Deep Dive</button>
-        </div>
       </div>
     </div>
   </div>
@@ -727,7 +699,6 @@
 let USER_NAME = '';
 let conversationHistory = [];
 let systemPrompt = '';
-let currentMode = 'navigator';
 let isStreaming = false;
 
 // ===== SETUP =====
@@ -752,9 +723,6 @@ async function startSession() {
 
   // Add context about available tools and capabilities
   systemPrompt += `\n\n## Tools available in this session\n\nYou have access to a web_fetch tool. When the user shares a website URL, the platform will automatically fetch the page HTML and provide it to you as context. You can then analyze the site for technology stack, content, structure, SEO signals, and more.\n\nThe user's name is: ${USER_NAME}\n\n## Generating visual output\n\nYou can generate TWO types of visual output that render live in the Preview panel:\n\n### 1. Deliverables (documents for the client)\nOne-pagers, full documents, email pitches, slide decks. Output the COMPLETE HTML inside a code block with the language tag \`\`\`html-deliverable. Requirements:\n- Self-contained with all CSS inline or in a <style> block\n- Use A4 dimensions (210mm x 297mm) for print-ready documents\n- Print-ready CSS (@page, print-color-adjust)\n- Import fonts from Google Fonts CDN\n- The deliverable must be COMPLETE and BEAUTIFUL — this is the user's output for their client\n- Include the attribution line at the bottom: "Preparado por ${USER_NAME} · Powered by FigStudio"\n\n### 2. Website mockups (visual design previews)\nWhen the user wants to see what the new or improved website could look like, generate a FULL HTML page that serves as a visual mockup. Use the same \`\`\`html-deliverable code block — the Preview panel will render it identically.\n\nFor website mockups:\n- Build a complete, realistic-looking page — not a wireframe. It should look like a real website.\n- Use modern design patterns, clean typography, good spacing\n- Include placeholder content that matches the client's actual business (real service names, realistic copy, appropriate imagery via placeholder services or CSS gradients/shapes)\n- Make it responsive-looking within the preview\n- Use the client's actual brand colors if known, or propose a professional palette\n- Include all key sections: hero, services, reviews/trust signals, contact, footer\n- The user can ask for different styles, variations, or specific changes — each new version replaces the previous one in Preview\n- This is NOT the final website — it's a visual concept to help the user and their client align on direction before building\n\nThe mockup capability is powerful: the user can say "show me what the new homepage could look like" and you produce a complete visual design in seconds. They can then iterate: "make it more modern", "try a different color scheme", "add a reviews section." Each iteration renders live.`;
-
-  // Add mode context
-  systemPrompt += `\n\nThe user is currently in ${currentMode.replace('-', ' ')} mode.`;
 
   // Opening message — Refine-first, concrete, value-forward
   addMessage('assistant', getOpeningMessage());
@@ -905,11 +873,7 @@ async function sendMessage() {
 
 // ===== CLAUDE API (via backend proxy) =====
 async function callClaude(messages) {
-  // Build current system prompt with latest mode
-  let currentSystem = systemPrompt.replace(
-    /The user is currently in .* mode\./,
-    `The user is currently in ${currentMode.replace('-', ' ')} mode.`
-  );
+  const currentSystem = systemPrompt;
 
   const resp = await fetch('/api/chat', {
     method: 'POST',
@@ -1090,13 +1054,6 @@ function exportPDF() {
     return;
   }
   iframe.contentWindow.print();
-}
-
-// ===== MODE SELECTION =====
-function setMode(mode, el) {
-  currentMode = mode;
-  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
 }
 
 // ===== HELPERS =====
