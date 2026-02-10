@@ -653,6 +653,53 @@
     display: none;
   }
 
+  /* Error message */
+  .msg-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    border-radius: var(--radius-sm);
+    margin: 4px 0;
+    animation: msgIn 0.3s ease-out;
+  }
+
+  .msg-error-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .msg-error-content {
+    flex: 1;
+  }
+
+  .msg-error-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .msg-error-retry {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    background: none;
+    border: 1px solid rgba(166, 124, 82, 0.3);
+    border-radius: var(--radius-xs);
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .msg-error-retry:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+
   /* Deliverable notification */
   .deliverable-notice {
     display: flex;
@@ -980,12 +1027,58 @@ async function sendMessage() {
   } catch(err) {
     removeThinking();
     removeUrlAnalysis();
-    addMessage('assistant', `Something went wrong: ${err.message}. Check your API key and try again.`);
+    showError(text);
+    console.error('FigStudio error:', err);
   }
 
   isStreaming = false;
   document.getElementById('sendBtn').disabled = false;
   input.focus();
+}
+
+function showError(lastMessage) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `
+    <div class="msg-error">
+      <svg class="msg-error-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div class="msg-error-content">
+        <div class="msg-error-text">Couldn't process that request. This can happen with complex or very long responses.</div>
+        <button class="msg-error-retry" onclick="retryLastMessage(this)">Try again</button>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  div.dataset.lastMessage = lastMessage;
+}
+
+function retryLastMessage(btn) {
+  const errorDiv = btn.closest('.msg');
+  const lastMessage = errorDiv.dataset.lastMessage;
+  errorDiv.remove();
+
+  // Remove the last user message from history (it'll be re-added by sendMessage)
+  if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'user') {
+    conversationHistory.pop();
+  }
+  // Remove the user message bubble too
+  const msgs = document.querySelectorAll('.msg-user');
+  if (msgs.length > 0) {
+    msgs[msgs.length - 1].remove();
+  }
+
+  // Re-send
+  const input = document.getElementById('userInput');
+  input.value = lastMessage;
+  autoResize(input);
+  updateSendBtn();
+  sendMessage();
 }
 
 // ===== CLAUDE API (via backend proxy) =====
