@@ -1342,6 +1342,79 @@ async function fetchUrl(url) {
       return href.includes('facebook') || href.includes('instagram') || href.includes('twitter') || href.includes('linkedin') || href.includes('youtube') || href.includes('tiktok');
     });
 
+    // ===== SITE NAVIGATION & SUBPAGES ANALYSIS =====
+    const navSignals = [];
+
+    // Extract all internal link paths to map site structure
+    const internalPaths = [...internalLinks].map(a => {
+      try {
+        const u = new URL(a.href, url);
+        return u.pathname.replace(/\/$/, '') || '/';
+      } catch { return null; }
+    }).filter(Boolean);
+    const uniquePaths = [...new Set(internalPaths)].filter(p => p !== '/');
+
+    // Detect blog
+    const blogKeywords = ['blog', 'noticias', 'news', 'articulos', 'articles', 'posts', 'actualidad', 'novedades'];
+    const blogLinks = [...internalLinks].filter(a => {
+      const href = (a.href || '').toLowerCase();
+      const text = (a.textContent || '').toLowerCase().trim();
+      return blogKeywords.some(k => href.includes(k) || text.includes(k));
+    });
+    const hasBlogSection = blogLinks.length > 0 || blogKeywords.some(k => htmlLower.includes(k));
+
+    // Detect key pages from navigation
+    const navEl = doc.querySelector('nav, [role="navigation"], .navbar, .nav, .menu, #menu, #nav');
+    let navLinks = [];
+    if (navEl) {
+      navLinks = [...navEl.querySelectorAll('a')].map(a => ({
+        text: a.textContent.trim().substring(0, 50),
+        href: a.href || a.getAttribute('href') || ''
+      })).filter(l => l.text && l.text.length > 0);
+    }
+
+    // If no nav element found, try to detect nav-like link clusters
+    if (navLinks.length === 0) {
+      const allNavCandidates = doc.querySelectorAll('header a, .header a, #header a, .navegacion a, .navigation a');
+      navLinks = [...allNavCandidates].map(a => ({
+        text: a.textContent.trim().substring(0, 50),
+        href: a.href || a.getAttribute('href') || ''
+      })).filter(l => l.text && l.text.length > 0);
+    }
+
+    if (navLinks.length > 0) {
+      navSignals.push(`Navigation links found (${navLinks.length}): ${navLinks.slice(0, 10).map(l => l.text).join(' · ')}`);
+    } else {
+      navSignals.push('⚠️ No clear navigation menu detected — site may lack standard nav structure');
+    }
+
+    if (hasBlogSection) {
+      navSignals.push(`✅ Blog/news section detected (${blogLinks.length} blog-related links found)`);
+    } else {
+      navSignals.push('No blog or news section detected');
+    }
+
+    // Detect sitemap
+    if (htmlLower.includes('sitemap')) {
+      navSignals.push('Sitemap reference found');
+    }
+
+    // Map discovered subpages
+    if (uniquePaths.length > 0) {
+      navSignals.push(`Discovered ${uniquePaths.length} unique internal paths: ${uniquePaths.slice(0, 15).join(', ')}${uniquePaths.length > 15 ? '...' : ''}`);
+    } else {
+      navSignals.push('⚠️ No internal subpage links found — this may be a single-page site or content is loaded dynamically');
+    }
+
+    // Detect if single-page (anchors only)
+    const anchorLinks = [...internalLinks].filter(a => {
+      const href = a.getAttribute('href') || '';
+      return href.startsWith('#') || href.includes('/#');
+    });
+    if (anchorLinks.length > 3 && uniquePaths.length < 3) {
+      navSignals.push('Appears to be a single-page site (mostly anchor links, few actual subpages)');
+    }
+
     const content = `
 SITE STRUCTURE:
 - Internal links: ${internalLinks.length}
@@ -1350,6 +1423,9 @@ SITE STRUCTURE:
 - H1 tags: ${h1s.length}
 - H2 tags: ${h2s.length}
 - Social media links: ${socialLinks.length} (${socialLinks.map(a => { try { return new URL(a.href).hostname; } catch { return ''; }}).filter(Boolean).join(', ') || 'none'})
+
+NAVIGATION & SITE PAGES:
+${navSignals.join('\n')}
 
 HEADING HIERARCHY:
 ${headingsInfo.join('\n') || 'No headings found'}
