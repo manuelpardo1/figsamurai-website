@@ -373,6 +373,7 @@
     display: flex;
     flex-direction: column;
     background: var(--bg);
+    overflow: hidden;
   }
 
   .preview-header {
@@ -385,12 +386,50 @@
     flex-shrink: 0;
   }
 
+  .preview-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   .preview-title {
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-subtle);
+  }
+
+  .preview-version {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .preview-version-btn {
+    width: 22px; height: 22px;
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-subtle);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+    font-family: inherit;
+    padding: 0;
+  }
+  .preview-version-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); border-color: var(--border-light); }
+  .preview-version-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+  .preview-version-label {
+    font-size: 10px;
+    color: var(--text-subtle);
+    font-weight: 500;
+    min-width: 40px;
+    text-align: center;
   }
 
   .preview-actions {
@@ -400,10 +439,12 @@
 
   .preview-body {
     flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    position: relative;
   }
 
   .preview-empty {
@@ -442,6 +483,7 @@
     border: none;
     background: white;
     display: none;
+    overflow-x: hidden;
   }
 
   /* ===== SETUP MODAL ===== */
@@ -831,7 +873,14 @@
   <!-- PREVIEW -->
   <div class="preview-panel" id="previewPanel">
     <div class="preview-header">
-      <span class="preview-title">Preview</span>
+      <div class="preview-header-left">
+        <span class="preview-title">Preview</span>
+        <div class="preview-version" id="previewVersion" style="display:none;">
+          <button class="preview-version-btn" id="prevVersionBtn" onclick="showVersion(-1)" disabled title="Previous version">◀</button>
+          <span class="preview-version-label" id="versionLabel">v1/1</span>
+          <button class="preview-version-btn" id="nextVersionBtn" onclick="showVersion(1)" disabled title="Next version">▶</button>
+        </div>
+      </div>
       <div class="preview-actions">
         <button class="topbar-btn" onclick="exportPDF()">Download PDF</button>
       </div>
@@ -861,6 +910,8 @@ let conversationHistory = [];
 let systemPrompt = '';
 let currentMode = 'guided';
 let isStreaming = false;
+let deliverableHistory = [];  // Array of HTML strings
+let currentVersionIndex = -1; // -1 = no deliverables yet
 
 // ===== SETUP =====
 async function startSession() {
@@ -1221,12 +1272,16 @@ ${bodyText.substring(0, 3000)}
   }
 }
 
-// ===== DELIVERABLE DETECTION =====
+// ===== DELIVERABLE DETECTION & VERSIONING =====
 function checkForDeliverable(content) {
   const match = content.match(/```html-deliverable\n([\s\S]*?)```/);
   if (match) {
     const html = match[1];
+    // Add to history
+    deliverableHistory.push(html);
+    currentVersionIndex = deliverableHistory.length - 1;
     showPreview(html);
+    updateVersionUI();
   }
 }
 
@@ -1237,7 +1292,37 @@ function showPreview(html) {
   empty.style.display = 'none';
   iframe.style.display = 'block';
 
-  iframe.srcdoc = html;
+  // Wrap the deliverable HTML to contain it within the iframe without overflow
+  const wrappedHtml = html.replace('</head>', `
+    <style>
+      html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+      body { transform-origin: top left; }
+    </style>
+  </head>`);
+  iframe.srcdoc = wrappedHtml;
+
+  // After iframe loads, scale content to fit panel width
+  iframe.onload = function() {
+    try {
+      const doc = iframe.contentDocument;
+      const body = doc.body;
+      if (body) {
+        const contentWidth = body.scrollWidth;
+        const frameWidth = iframe.clientWidth;
+        if (contentWidth > frameWidth && frameWidth > 0) {
+          const scale = frameWidth / contentWidth;
+          body.style.transform = `scale(${scale})`;
+          body.style.transformOrigin = 'top left';
+          body.style.width = (contentWidth) + 'px';
+          // Adjust iframe height to account for scaling
+          const contentHeight = body.scrollHeight;
+          iframe.style.height = (contentHeight * scale) + 'px';
+        }
+      }
+    } catch(e) {
+      // Cross-origin or other error — ignore, it'll still render
+    }
+  };
 
   // Make sure preview panel is visible
   const panel = document.getElementById('previewPanel');
@@ -1245,6 +1330,31 @@ function showPreview(html) {
     panel.style.display = 'flex';
     document.getElementById('previewToggle').textContent = 'Preview';
   }
+}
+
+function updateVersionUI() {
+  const versionEl = document.getElementById('previewVersion');
+  const labelEl = document.getElementById('versionLabel');
+  const prevBtn = document.getElementById('prevVersionBtn');
+  const nextBtn = document.getElementById('nextVersionBtn');
+
+  if (deliverableHistory.length <= 0) {
+    versionEl.style.display = 'none';
+    return;
+  }
+
+  versionEl.style.display = 'flex';
+  labelEl.textContent = `v${currentVersionIndex + 1}/${deliverableHistory.length}`;
+  prevBtn.disabled = currentVersionIndex <= 0;
+  nextBtn.disabled = currentVersionIndex >= deliverableHistory.length - 1;
+}
+
+function showVersion(delta) {
+  const newIndex = currentVersionIndex + delta;
+  if (newIndex < 0 || newIndex >= deliverableHistory.length) return;
+  currentVersionIndex = newIndex;
+  showPreview(deliverableHistory[currentVersionIndex]);
+  updateVersionUI();
 }
 
 // ===== PREVIEW TOGGLE =====
