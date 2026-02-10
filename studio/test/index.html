@@ -1179,7 +1179,16 @@ async function fetchUrl(url) {
     // Tech detection
     const techSignals = [];
     const htmlLower = html.toLowerCase();
-    if (htmlLower.includes('bootstrap')) techSignals.push('Bootstrap');
+
+    // Frameworks & CMS
+    if (htmlLower.includes('bootstrap')) {
+      // Detect Bootstrap version
+      if (htmlLower.includes('col-xs-') && !htmlLower.includes('col-xl-')) techSignals.push('Bootstrap 3 (outdated — EOL since 2019, no flexbox grid)');
+      else if (htmlLower.includes('col-xl-') || htmlLower.includes('bootstrap@5') || htmlLower.includes('bootstrap/5')) techSignals.push('Bootstrap 5 (modern)');
+      else if (htmlLower.includes('bootstrap@4') || htmlLower.includes('bootstrap/4')) techSignals.push('Bootstrap 4');
+      else techSignals.push('Bootstrap (version unclear)');
+    }
+    if (htmlLower.includes('tailwind') || htmlLower.includes('tw-')) techSignals.push('Tailwind CSS');
     if (htmlLower.includes('jquery') || htmlLower.includes('jquery.min.js')) techSignals.push('jQuery');
     if (htmlLower.includes('wordpress') || htmlLower.includes('wp-content')) techSignals.push('WordPress');
     if (htmlLower.includes('react')) techSignals.push('React');
@@ -1189,8 +1198,8 @@ async function fetchUrl(url) {
     if (htmlLower.includes('webflow')) techSignals.push('Webflow');
     if (htmlLower.includes('shopify')) techSignals.push('Shopify');
     if (htmlLower.includes('elementor')) techSignals.push('Elementor');
-    if (!doc.querySelector('meta[name="viewport"]')) techSignals.push('NO viewport meta (not mobile-optimized)');
-    else techSignals.push('Has viewport meta (mobile-ready)');
+
+    // SSL & canonical
     if (html.includes('https://') || html.includes('ssl')) techSignals.push('SSL detected');
     if (doc.querySelector('link[rel="canonical"]')) techSignals.push('Has canonical URL');
     if (!doc.querySelector('link[rel="canonical"]')) techSignals.push('Missing canonical URL');
@@ -1199,6 +1208,101 @@ async function fetchUrl(url) {
     const jsonLd = doc.querySelectorAll('script[type="application/ld+json"]');
     if (jsonLd.length > 0) techSignals.push(`Structured data (${jsonLd.length} JSON-LD blocks)`);
     else techSignals.push('No structured data (JSON-LD) found');
+
+    // ===== MOBILE RESPONSIVENESS DEEP ANALYSIS =====
+    const mobileSignals = [];
+
+    // 1. Viewport meta tag
+    const viewportMeta = doc.querySelector('meta[name="viewport"]');
+    if (!viewportMeta) {
+      mobileSignals.push('⛔ NO viewport meta tag — mobile browsers will render at ~980px width and shrink. This is the #1 mobile failure.');
+    } else {
+      const vpContent = viewportMeta.content || '';
+      if (vpContent.includes('width=device-width')) {
+        mobileSignals.push('✅ Has viewport meta tag with width=device-width');
+      } else {
+        mobileSignals.push('⚠️ Has viewport meta tag but WITHOUT width=device-width — may not render correctly on mobile');
+      }
+      if (vpContent.includes('user-scalable=no') || vpContent.includes('maximum-scale=1')) {
+        mobileSignals.push('⚠️ Viewport disables zoom (user-scalable=no or max-scale=1) — accessibility issue');
+      }
+    }
+
+    // 2. CSS media queries detection
+    const styleBlocks = doc.querySelectorAll('style');
+    const linkSheets = doc.querySelectorAll('link[rel="stylesheet"]');
+    let mediaQueryCount = 0;
+    let inlineCSS = '';
+    styleBlocks.forEach(s => { inlineCSS += s.textContent; });
+    const mediaMatches = inlineCSS.match(/@media[^{]*/g);
+    mediaQueryCount = mediaMatches ? mediaMatches.length : 0;
+    // Also check in inline HTML (style attributes won't have @media, but script-injected styles might)
+    const htmlMediaMatches = html.match(/@media[^{]*/g);
+    const totalMediaQueries = htmlMediaMatches ? htmlMediaMatches.length : 0;
+
+    if (totalMediaQueries === 0) {
+      mobileSignals.push('⛔ ZERO CSS @media queries found — responsiveness is either JS-only (fragile) or absent');
+    } else if (totalMediaQueries <= 3) {
+      mobileSignals.push(`⚠️ Only ${totalMediaQueries} CSS @media queries — minimal responsive CSS`);
+    } else {
+      mobileSignals.push(`✅ ${totalMediaQueries} CSS @media queries found — has responsive CSS breakpoints`);
+    }
+
+    // 3. JS-dependent responsiveness detection
+    const jsResponsive = [];
+    if (html.includes('window.innerWidth') || html.includes('innerWidth')) jsResponsive.push('window.innerWidth checks');
+    if (html.includes('matchMedia')) jsResponsive.push('matchMedia()');
+    if (html.includes('resize')) jsResponsive.push('resize event listeners');
+    if (html.includes('orientationchange')) jsResponsive.push('orientationchange');
+    if (jsResponsive.length > 0 && totalMediaQueries <= 3) {
+      mobileSignals.push(`⚠️ Responsiveness appears JS-dependent (${jsResponsive.join(', ')}). If JavaScript fails, layout breaks on mobile.`);
+    } else if (jsResponsive.length > 0) {
+      mobileSignals.push(`JS-assisted responsive: ${jsResponsive.join(', ')}`);
+    }
+
+    // 4. Fixed-width containers that could break mobile
+    const fixedWidthMatches = html.match(/width\s*:\s*(\d{4,})px/g) || [];
+    const fixedWidthLarge = fixedWidthMatches.filter(m => {
+      const px = parseInt(m.match(/(\d+)/)[1]);
+      return px >= 960;
+    });
+    if (fixedWidthLarge.length > 0) {
+      mobileSignals.push(`⛔ ${fixedWidthLarge.length} fixed-width elements ≥960px found — will overflow on mobile screens`);
+    }
+    // Check for common fixed-width containers
+    const fixedContainers = html.match(/width\s*:\s*(9\d{2}|1[0-9]{3})px/g);
+    if (fixedContainers && fixedContainers.length > 0) {
+      mobileSignals.push(`Fixed-width containers: ${fixedContainers.slice(0, 5).join(', ')}`);
+    }
+
+    // 5. Responsive images
+    const hasSrcset = doc.querySelectorAll('img[srcset], source[srcset]').length;
+    const hasPicture = doc.querySelectorAll('picture').length;
+    const hasLazyLoad = doc.querySelectorAll('img[loading="lazy"], img[data-src], img[data-lazy-src]').length;
+    const imgSignals = [];
+    if (hasSrcset > 0) imgSignals.push(`${hasSrcset} images with srcset`);
+    if (hasPicture > 0) imgSignals.push(`${hasPicture} <picture> elements`);
+    if (hasLazyLoad > 0) imgSignals.push(`${hasLazyLoad} lazy-loaded images`);
+    if (imgSignals.length > 0) {
+      mobileSignals.push(`✅ Responsive images: ${imgSignals.join(', ')}`);
+    } else if (images.length > 3) {
+      mobileSignals.push(`⚠️ ${images.length} images but NO srcset, <picture>, or lazy loading — mobile users download full-size desktop images`);
+    }
+
+    // 6. Touch/mobile UX signals
+    if (htmlLower.includes('hamburger') || htmlLower.includes('mobile-nav') || htmlLower.includes('nav-toggle') || htmlLower.includes('menu-toggle') || htmlLower.includes('navbar-toggle') || htmlLower.includes('navbar-toggler')) {
+      mobileSignals.push('✅ Has mobile navigation toggle (hamburger menu)');
+    }
+    if (htmlLower.includes('touch-action') || htmlLower.includes('touchstart') || htmlLower.includes('touchmove')) {
+      mobileSignals.push('Has touch event handling');
+    }
+
+    // 7. Font size check — tiny text on mobile
+    const tinyFontMatches = inlineCSS.match(/font-size\s*:\s*(\d+)px/g) || [];
+    const tinyFonts = tinyFontMatches.filter(m => parseInt(m.match(/(\d+)/)[1]) < 12);
+    if (tinyFonts.length > 3) {
+      mobileSignals.push(`⚠️ ${tinyFonts.length} font-size declarations under 12px — may be unreadable on mobile`);
+    }
 
     // Content extraction
     const bodyText = doc.body?.textContent?.replace(/\s+/g, ' ').trim().substring(0, 4000) || '';
@@ -1252,6 +1356,9 @@ ${headingsInfo.join('\n') || 'No headings found'}
 
 IMAGES (first 10):
 ${imgInfo || 'No images detected'}
+
+MOBILE & RESPONSIVENESS ANALYSIS:
+${mobileSignals.join('\n')}
 
 CONTACT SIGNALS:
 - Phone visible: ${phoneMatch ? 'Yes' : 'Not easily found'}
