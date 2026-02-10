@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FigSamurai · Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0B;
+    --bg-secondary: #131316;
+    --bg-tertiary: #1C1C21;
+    --bg-hover: #232329;
+    --border: #2A2A32;
+    --border-light: #35353F;
+    --text: #F0F0F3;
+    --text-muted: #9999A8;
+    --text-subtle: #6B6B7B;
+    --accent: #A67C52;
+    --accent-hover: #B88B60;
+    --accent-glow: rgba(166, 124, 82, 0.15);
+    --accent-soft: rgba(166, 124, 82, 0.08);
+    --accent-bronze: #A67C52;
+    --accent-warm: #8B7355;
+    --samurai-red: #C41E3A;
+    --green: #34D399;
+    --green-soft: rgba(52, 211, 153, 0.1);
+    --amber: #FBBF24;
+    --amber-soft: rgba(251, 191, 36, 0.1);
+    --red: #F87171;
+    --fig-gradient: linear-gradient(135deg, #A67C52, #8B7355);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    height: 52px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg {
+    width: 24px; height: 24px;
+  }
+
+  .logo-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .logo-text span {
+    color: var(--accent-bronze);
+  }
+
+  .topbar-status {
+    font-size: 11px;
+    color: var(--text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .topbar-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .topbar-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--border-light); }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ===== CHAT PANEL ===== */
+  .chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .msg {
+    max-width: 720px;
+    line-height: 1.65;
+    font-size: 14px;
+    animation: msgIn 0.3s ease-out;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-assistant {
+    color: var(--text);
+  }
+
+  .msg-assistant .msg-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .msg-assistant .msg-body {
+    color: var(--text);
+  }
+
+  .msg-assistant .msg-body p { margin-bottom: 10px; }
+  .msg-assistant .msg-body p:last-child { margin-bottom: 0; }
+  .msg-assistant .msg-body strong { color: var(--text); font-weight: 600; }
+  .msg-assistant .msg-body em { color: var(--text-muted); font-style: italic; }
+  .msg-assistant .msg-body code {
+    background: var(--bg-tertiary);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .msg-user {
+    align-self: flex-end;
+    margin-left: auto;
+  }
+
+  .msg-user .msg-body {
+    background: var(--accent-soft);
+    border: 1px solid rgba(166, 124, 82, 0.2);
+    border-radius: var(--radius) var(--radius-xs) var(--radius) var(--radius);
+    padding: 12px 16px;
+    color: var(--text);
+  }
+
+  /* ===== THINKING INDICATOR ===== */
+  .thinking {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    animation: msgIn 0.3s ease-out;
+  }
+
+  .thinking-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .thinking-dots span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: dot 1.2s infinite ease-in-out;
+  }
+  .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dot {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .thinking-text {
+    font-size: 12px;
+    color: var(--text-subtle);
+  }
+
+  /* ===== URL ANALYSIS INDICATOR ===== */
+  .url-analysis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(166, 124, 82, 0.15);
+    border-radius: var(--radius-xs);
+    margin: 4px 0;
+    animation: msgIn 0.3s ease-out;
+  }
+
+  .url-analysis-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(166, 124, 82, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .url-analysis-text {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ===== INPUT AREA ===== */
+  .input-area {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+  }
+
+  .input-box {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+  }
+
+  .input-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+
+  .input-box textarea {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+    min-height: 21px;
+  }
+
+  .input-box textarea::placeholder { color: var(--text-subtle); }
+
+  .send-btn {
+    width: 32px; height: 32px;
+    border-radius: var(--radius-xs);
+    background: var(--fig-gradient);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .send-btn:hover { opacity: 0.9; transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  .input-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding: 0 2px;
+  }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--text-subtle);
+  }
+
+  .mode-indicator {
+    display: flex;
+    gap: 4px;
+  }
+
+  .mode-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-subtle);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .mode-pill.active {
+    background: var(--accent-soft);
+    border-color: rgba(166, 124, 82, 0.3);
+    color: var(--accent);
+  }
+  .mode-pill:hover { border-color: var(--border-light); color: var(--text-muted); }
+
+  /* ===== PREVIEW PANEL ===== */
+  .preview-panel {
+    width: 48%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+  }
+
+  .preview-header {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .preview-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-subtle);
+  }
+
+  .preview-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .preview-body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-empty {
+    text-align: center;
+    padding: 40px;
+  }
+
+  .preview-empty-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+  }
+
+  .preview-empty h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .preview-empty p {
+    font-size: 12px;
+    color: var(--text-subtle);
+    line-height: 1.5;
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+    display: none;
+  }
+
+  /* ===== SETUP MODAL ===== */
+  .setup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .setup-modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    width: 420px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .setup-modal h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .setup-modal .setup-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .setup-field {
+    margin-bottom: 16px;
+  }
+
+  .setup-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .setup-field input {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .setup-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+
+  .setup-field input::placeholder { color: var(--text-subtle); }
+
+  .setup-start {
+    width: 100%;
+    padding: 12px;
+    background: var(--fig-gradient);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.15s;
+  }
+  .setup-start:hover { opacity: 0.9; }
+  .setup-start:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .setup-note {
+    font-size: 11px;
+    color: var(--text-subtle);
+    text-align: center;
+    margin-top: 12px;
+    line-height: 1.4;
+  }
+
+  /* ===== MARKDOWN RENDERING ===== */
+  .msg-body h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 14px 0 6px;
+    color: var(--text);
+  }
+
+  .msg-body ul, .msg-body ol {
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+
+  .msg-body li {
+    margin-bottom: 4px;
+  }
+
+  .msg-body blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+    margin: 10px 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .msg-body hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+  }
+
+  /* Deliverable notification */
+  .deliverable-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--green-soft);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+    border-radius: var(--radius-xs);
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .deliverable-notice svg {
+    flex-shrink: 0;
+  }
+
+  /* ===== BRAND FOOTER ===== */
+  .brand-footer {
+    position: fixed;
+    bottom: 8px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--text-subtle);
+    opacity: 0.5;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .brand-footer svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .brand-footer span {
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .preview-panel { display: none; }
+    .chat-panel { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP MODAL -->
+<div class="setup-overlay" id="setupOverlay">
+  <div class="setup-modal">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+      <div class="logo-mark">
+        <svg viewBox="0 0 100 100" fill="none">
+          <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+          <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.3"/>
+          <path d="M50 30C40 40 35 55 38 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+          <path d="M50 30C60 40 65 55 62 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+          <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
+        </svg>
+      </div>
+      <span class="logo-text">Fig<span>Samurai</span></span>
+    </div>
+    <h2>Welcome</h2>
+    <p class="setup-subtitle">FigStudio helps you build, refine, and sell digital products. Tell me your name and let's get to work.</p>
+    <div class="setup-field">
+      <label>Your name</label>
+      <input type="text" id="userNameInput" placeholder="Your name" autocomplete="off" autofocus>
+    </div>
+    <button class="setup-start" id="setupStart" onclick="startSession()">Start</button>
+    <div class="setup-note">Private beta &middot; FigSamurai Studio</div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 100 100" fill="none">
+        <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="white"/>
+        <path d="M50 15V85" stroke="#A67C52" stroke-width="2" opacity="0.3"/>
+        <path d="M50 30C40 40 35 55 38 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+        <path d="M50 30C60 40 65 55 62 70" stroke="#A67C52" stroke-width="1.5" opacity="0.2"/>
+        <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
+      </svg>
+    </div>
+    <span class="logo-text">Fig<span>Samurai</span></span>
+    <div class="topbar-status">
+      <span class="status-dot"></span>
+      Studio
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="previewToggle" onclick="togglePreview()">Preview</button>
+    <button class="topbar-btn" onclick="exportPDF()">Export PDF</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="input-area">
+      <div class="input-box">
+        <textarea id="userInput" rows="1" placeholder="Tell me what you need..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-meta">
+        <span class="input-hint">Enter to send &middot; Shift+Enter for new line</span>
+        <div class="mode-indicator">
+          <button class="mode-pill" onclick="setMode('autopilot', this)">Autopilot</button>
+          <button class="mode-pill active" onclick="setMode('navigator', this)">Navigator</button>
+          <button class="mode-pill" onclick="setMode('deep-dive', this)">Deep Dive</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel" id="previewPanel">
+    <div class="preview-header">
+      <span class="preview-title">Preview</span>
+      <div class="preview-actions">
+        <button class="topbar-btn" onclick="exportPDF()">Download PDF</button>
+      </div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-empty" id="previewEmpty">
+        <div class="preview-empty-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-subtle)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+        <h3>No deliverable yet</h3>
+        <p>Your documents will appear here as we work together.</p>
+      </div>
+      <iframe class="preview-iframe" id="previewIframe"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let USER_NAME = '';
+let conversationHistory = [];
+let systemPrompt = '';
+let currentMode = 'navigator';
+let isStreaming = false;
+
+// ===== SETUP =====
+async function startSession() {
+  const name = document.getElementById('userNameInput').value.trim();
+  if (!name) return;
+
+  USER_NAME = name;
+
+  document.getElementById('setupOverlay').style.display = 'none';
+
+  // Load system prompt
+  try {
+    const resp = await fetch('system-prompt.md');
+    systemPrompt = await resp.text();
+  } catch(e) {
+    systemPrompt = 'You are FigStudio Advisor, an AI-guided platform for building digital products.';
+  }
+
+  // Replace placeholder with real name
+  systemPrompt = systemPrompt.replace(/\[USER NAME\]/g, USER_NAME);
+
+  // Add context about available tools and capabilities
+  systemPrompt += `\n\n## Tools available in this session\n\nYou have access to a web_fetch tool. When the user shares a website URL, the platform will automatically fetch the page HTML and provide it to you as context. You can then analyze the site for technology stack, content, structure, SEO signals, and more.\n\nThe user's name is: ${USER_NAME}\n\n## Generating visual output\n\nYou can generate TWO types of visual output that render live in the Preview panel:\n\n### 1. Deliverables (documents for the client)\nOne-pagers, full documents, email pitches, slide decks. Output the COMPLETE HTML inside a code block with the language tag \`\`\`html-deliverable. Requirements:\n- Self-contained with all CSS inline or in a <style> block\n- Use A4 dimensions (210mm x 297mm) for print-ready documents\n- Print-ready CSS (@page, print-color-adjust)\n- Import fonts from Google Fonts CDN\n- The deliverable must be COMPLETE and BEAUTIFUL — this is the user's output for their client\n- Include the attribution line at the bottom: "Preparado por ${USER_NAME} · Powered by FigStudio"\n\n### 2. Website mockups (visual design previews)\nWhen the user wants to see what the new or improved website could look like, generate a FULL HTML page that serves as a visual mockup. Use the same \`\`\`html-deliverable code block — the Preview panel will render it identically.\n\nFor website mockups:\n- Build a complete, realistic-looking page — not a wireframe. It should look like a real website.\n- Use modern design patterns, clean typography, good spacing\n- Include placeholder content that matches the client's actual business (real service names, realistic copy, appropriate imagery via placeholder services or CSS gradients/shapes)\n- Make it responsive-looking within the preview\n- Use the client's actual brand colors if known, or propose a professional palette\n- Include all key sections: hero, services, reviews/trust signals, contact, footer\n- The user can ask for different styles, variations, or specific changes — each new version replaces the previous one in Preview\n- This is NOT the final website — it's a visual concept to help the user and their client align on direction before building\n\nThe mockup capability is powerful: the user can say "show me what the new homepage could look like" and you produce a complete visual design in seconds. They can then iterate: "make it more modern", "try a different color scheme", "add a reviews section." Each iteration renders live.`;
+
+  // Add mode context
+  systemPrompt += `\n\nThe user is currently in ${currentMode.replace('-', ' ')} mode.`;
+
+  // Opening message — Refine-first, concrete, value-forward
+  addMessage('assistant', getOpeningMessage());
+  document.getElementById('userInput').focus();
+}
+
+function getOpeningMessage() {
+  return `Hey ${USER_NAME} \u2014 what do you need?\n\nIf you have a website that needs work, drop the URL and tell me what the client asked for. If you're starting something from scratch, tell me the idea. I'll take it from there.`;
+}
+
+// ===== MESSAGES =====
+function addMessage(role, content) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+
+  if (role === 'assistant') {
+    div.innerHTML = `
+      <div class="msg-label">
+        <svg width="14" height="14" viewBox="0 0 100 100" fill="none">
+          <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor" opacity="0.7"/>
+          <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
+        </svg>
+        FigStudio
+      </div>
+      <div class="msg-body">${renderMarkdown(content)}</div>
+    `;
+  } else {
+    div.innerHTML = `<div class="msg-body">${escapeHtml(content)}</div>`;
+  }
+
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+
+  // Check for deliverable HTML in the response
+  if (role === 'assistant') {
+    checkForDeliverable(content);
+  }
+
+  return div;
+}
+
+function addThinking(text) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'thinking';
+  div.id = 'thinkingIndicator';
+  div.innerHTML = `
+    <div class="thinking-dots"><span></span><span></span><span></span></div>
+    <span class="thinking-text">${text || 'Thinking...'}</span>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function updateThinking(text) {
+  const el = document.getElementById('thinkingIndicator');
+  if (el) {
+    const textEl = el.querySelector('.thinking-text');
+    if (textEl) textEl.textContent = text;
+  }
+}
+
+function removeThinking() {
+  const el = document.getElementById('thinkingIndicator');
+  if (el) el.remove();
+}
+
+function addUrlAnalysis(url) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'url-analysis';
+  div.id = 'urlAnalysis';
+  div.innerHTML = `
+    <div class="url-analysis-spinner"></div>
+    <span class="url-analysis-text">Analyzing ${truncateUrl(url)}...</span>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeUrlAnalysis() {
+  const el = document.getElementById('urlAnalysis');
+  if (el) el.remove();
+}
+
+function truncateUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.hostname;
+  } catch { return url.substring(0, 40); }
+}
+
+// ===== SEND =====
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text || isStreaming) return;
+
+  addMessage('user', text);
+  input.value = '';
+  autoResize(input);
+  updateSendBtn();
+
+  conversationHistory.push({ role: 'user', content: text });
+
+  isStreaming = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  try {
+    // Check for URL in the message — fetch it first
+    const urlMatch = text.match(/https?:\/\/[^\s,)]+/);
+    let enhancedMessages = [...conversationHistory];
+
+    if (urlMatch) {
+      addUrlAnalysis(urlMatch[0]);
+      try {
+        const urlData = await fetchUrl(urlMatch[0]);
+        removeUrlAnalysis();
+        if (urlData) {
+          enhancedMessages.push({
+            role: 'user',
+            content: `[FigStudio tool result — web_fetch for ${urlMatch[0]}]\n\nPage title: ${urlData.title}\nMeta description: ${urlData.description}\nTechnology signals: ${urlData.tech}\n\n${urlData.content}\n\n[End of tool result. Now analyze this site and respond to the user naturally. Remember: you're FigStudio Advisor. Be specific, diagnostic, and actionable. If this is a Refine case, demonstrate immediate understanding and add something they hadn't thought of.]`
+          });
+        }
+      } catch(e) {
+        removeUrlAnalysis();
+        // Continue without URL data
+      }
+    }
+
+    addThinking('Analyzing...');
+
+    const response = await callClaude(enhancedMessages);
+    removeThinking();
+    addMessage('assistant', response);
+    conversationHistory.push({ role: 'assistant', content: response });
+  } catch(err) {
+    removeThinking();
+    removeUrlAnalysis();
+    addMessage('assistant', `Something went wrong: ${err.message}. Check your API key and try again.`);
+  }
+
+  isStreaming = false;
+  document.getElementById('sendBtn').disabled = false;
+  input.focus();
+}
+
+// ===== CLAUDE API (via backend proxy) =====
+async function callClaude(messages) {
+  // Build current system prompt with latest mode
+  let currentSystem = systemPrompt.replace(
+    /The user is currently in .* mode\./,
+    `The user is currently in ${currentMode.replace('-', ' ')} mode.`
+  );
+
+  const resp = await fetch('/api/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 8192,
+      system: currentSystem,
+      messages: messages
+    })
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${resp.status}`);
+  }
+
+  const data = await resp.json();
+  return data.content[0].text;
+}
+
+// ===== URL FETCHING =====
+async function fetchUrl(url) {
+  try {
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+    if (!resp.ok) return null;
+
+    const html = await resp.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const title = doc.querySelector('title')?.textContent?.trim() || 'No title';
+    const description = doc.querySelector('meta[name="description"]')?.content || 'No meta description found';
+
+    // Tech detection
+    const techSignals = [];
+    const htmlLower = html.toLowerCase();
+    if (htmlLower.includes('bootstrap')) techSignals.push('Bootstrap');
+    if (htmlLower.includes('jquery') || htmlLower.includes('jquery.min.js')) techSignals.push('jQuery');
+    if (htmlLower.includes('wordpress') || htmlLower.includes('wp-content')) techSignals.push('WordPress');
+    if (htmlLower.includes('react')) techSignals.push('React');
+    if (htmlLower.includes('next') && htmlLower.includes('__next')) techSignals.push('Next.js');
+    if (htmlLower.includes('wix.com')) techSignals.push('Wix');
+    if (htmlLower.includes('squarespace')) techSignals.push('Squarespace');
+    if (htmlLower.includes('webflow')) techSignals.push('Webflow');
+    if (htmlLower.includes('shopify')) techSignals.push('Shopify');
+    if (htmlLower.includes('elementor')) techSignals.push('Elementor');
+    if (!doc.querySelector('meta[name="viewport"]')) techSignals.push('NO viewport meta (not mobile-optimized)');
+    else techSignals.push('Has viewport meta (mobile-ready)');
+    if (html.includes('https://') || html.includes('ssl')) techSignals.push('SSL detected');
+    if (doc.querySelector('link[rel="canonical"]')) techSignals.push('Has canonical URL');
+    if (!doc.querySelector('link[rel="canonical"]')) techSignals.push('Missing canonical URL');
+
+    // Structured data
+    const jsonLd = doc.querySelectorAll('script[type="application/ld+json"]');
+    if (jsonLd.length > 0) techSignals.push(`Structured data (${jsonLd.length} JSON-LD blocks)`);
+    else techSignals.push('No structured data (JSON-LD) found');
+
+    // Content extraction
+    const bodyText = doc.body?.textContent?.replace(/\s+/g, ' ').trim().substring(0, 4000) || '';
+
+    // Links
+    const links = doc.querySelectorAll('a[href]');
+    const internalLinks = [...links].filter(a => {
+      try { return new URL(a.href, url).hostname === new URL(url).hostname; } catch { return false; }
+    });
+
+    // Images
+    const images = doc.querySelectorAll('img');
+    const imgInfo = [...images].slice(0, 10).map(img => {
+      const src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '';
+      const alt = img.alt || 'no alt text';
+      return `  - ${src ? src.substring(0, 80) : 'no src'} (alt: "${alt}")`;
+    }).join('\n');
+
+    // Headings structure
+    const h1s = doc.querySelectorAll('h1');
+    const h2s = doc.querySelectorAll('h2');
+    const h3s = doc.querySelectorAll('h3');
+    const headingsInfo = [];
+    [...h1s].forEach(h => headingsInfo.push(`H1: "${h.textContent.trim().substring(0, 80)}"`));
+    [...h2s].slice(0, 5).forEach(h => headingsInfo.push(`H2: "${h.textContent.trim().substring(0, 80)}"`));
+    [...h3s].slice(0, 5).forEach(h => headingsInfo.push(`H3: "${h.textContent.trim().substring(0, 80)}"`));
+
+    // Forms
+    const forms = doc.querySelectorAll('form');
+
+    // Phone numbers
+    const phoneMatch = bodyText.match(/[\d\s.()-]{9,15}/g);
+
+    // Social links
+    const socialLinks = [...links].filter(a => {
+      const href = (a.href || '').toLowerCase();
+      return href.includes('facebook') || href.includes('instagram') || href.includes('twitter') || href.includes('linkedin') || href.includes('youtube') || href.includes('tiktok');
+    });
+
+    const content = `
+SITE STRUCTURE:
+- Internal links: ${internalLinks.length}
+- Total images: ${images.length}
+- Forms found: ${forms.length}
+- H1 tags: ${h1s.length}
+- H2 tags: ${h2s.length}
+- Social media links: ${socialLinks.length} (${socialLinks.map(a => { try { return new URL(a.href).hostname; } catch { return ''; }}).filter(Boolean).join(', ') || 'none'})
+
+HEADING HIERARCHY:
+${headingsInfo.join('\n') || 'No headings found'}
+
+IMAGES (first 10):
+${imgInfo || 'No images detected'}
+
+CONTACT SIGNALS:
+- Phone visible: ${phoneMatch ? 'Yes' : 'Not easily found'}
+- Has form: ${forms.length > 0 ? 'Yes' : 'No'}
+- Has map/address: ${htmlLower.includes('map') || htmlLower.includes('maps') || htmlLower.includes('address') || htmlLower.includes('direcc') ? 'Likely' : 'Not detected'}
+
+TRUST & REVIEW SIGNALS:
+- Reviews/testimonials section: ${htmlLower.includes('review') || htmlLower.includes('testimonial') || htmlLower.includes('opinion') || htmlLower.includes('reseña') ? 'Possibly present' : 'Not detected'}
+- Has Google Maps embed: ${htmlLower.includes('maps.google') || htmlLower.includes('google.com/maps') ? 'Yes' : 'No'}
+
+BODY TEXT (first 3000 chars):
+${bodyText.substring(0, 3000)}
+    `.trim();
+
+    return { title, description, tech: techSignals.join(', '), content };
+  } catch(e) {
+    return null;
+  }
+}
+
+// ===== DELIVERABLE DETECTION =====
+function checkForDeliverable(content) {
+  const match = content.match(/```html-deliverable\n([\s\S]*?)```/);
+  if (match) {
+    const html = match[1];
+    showPreview(html);
+  }
+}
+
+function showPreview(html) {
+  const iframe = document.getElementById('previewIframe');
+  const empty = document.getElementById('previewEmpty');
+
+  empty.style.display = 'none';
+  iframe.style.display = 'block';
+
+  iframe.srcdoc = html;
+
+  // Make sure preview panel is visible
+  const panel = document.getElementById('previewPanel');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'flex';
+    document.getElementById('previewToggle').textContent = 'Preview';
+  }
+}
+
+// ===== PREVIEW TOGGLE =====
+function togglePreview() {
+  const panel = document.getElementById('previewPanel');
+  const btn = document.getElementById('previewToggle');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'flex';
+    btn.textContent = 'Preview';
+  } else {
+    panel.style.display = 'none';
+    btn.textContent = 'Show Preview';
+  }
+}
+
+// ===== PDF EXPORT =====
+function exportPDF() {
+  const iframe = document.getElementById('previewIframe');
+  if (!iframe.srcdoc) {
+    alert('No deliverable to export yet. Build one first through the conversation.');
+    return;
+  }
+  iframe.contentWindow.print();
+}
+
+// ===== MODE SELECTION =====
+function setMode(mode, el) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== HELPERS =====
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  updateSendBtn();
+}
+
+function updateSendBtn() {
+  const input = document.getElementById('userInput');
+  document.getElementById('sendBtn').disabled = !input.value.trim() || isStreaming;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+}
+
+function renderMarkdown(text) {
+  // Strip deliverable code blocks and replace with notice
+  text = text.replace(/```html-deliverable\n[\s\S]*?```/g, '%%DELIVERABLE%%');
+
+  // Basic markdown rendering
+  let html = escapeHtml(text);
+
+  // Bold
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  html = html.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Headers
+  html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr>');
+  // Unordered lists
+  html = html.replace(/^- (.*$)/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>(<br>)?)+/g, function(match) {
+    return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
+  });
+  // Numbered lists
+  html = html.replace(/^\d+\. (.*$)/gm, '<li>$1</li>');
+  // Blockquotes
+  html = html.replace(/^&gt; (.*$)/gm, '<blockquote>$1</blockquote>');
+  // Paragraphs
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  // Clean up empty paragraphs and misplaced tags
+  html = html.replace(/<p><\/p>/g, '');
+  html = html.replace(/<p>(<h3>)/g, '$1');
+  html = html.replace(/(<\/h3>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<ul>)/g, '$1');
+  html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<hr>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<blockquote>)/g, '$1');
+  html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
+
+  // Replace deliverable placeholder with styled notice
+  html = html.replace(/%%DELIVERABLE%%/g, `
+    <div class="deliverable-notice">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+      </svg>
+      Deliverable generated — see Preview panel
+    </div>
+  `);
+
+  return html;
+}
+
+// ===== EVENT LISTENERS =====
+document.getElementById('userNameInput').addEventListener('input', () => {
+  document.getElementById('setupStart').disabled =
+    !document.getElementById('userNameInput').value.trim();
+});
+document.getElementById('userInput').addEventListener('input', () => updateSendBtn());
+
+// Allow Enter in setup name field to start session
+document.getElementById('userNameInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (!document.getElementById('setupStart').disabled) startSession();
+  }
+});
+
+// Initial state
+document.getElementById('setupStart').disabled = true;
+</script>
+
+<!-- Brand footer -->
+<div class="brand-footer">
+  <svg viewBox="0 0 100 100" fill="none">
+    <path d="M50 5C50 5 25 20 20 45C15 70 30 90 50 95C70 90 85 70 80 45C75 20 50 5 50 5Z" fill="currentColor"/>
+    <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
+  </svg>
+  <span>FigSamurai</span>
+</div>
+
+</body>
+</html>
