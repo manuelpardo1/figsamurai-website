@@ -534,6 +534,29 @@
     border-color: rgba(59, 130, 246, 0.4);
     color: rgb(59, 130, 246);
   }
+  .beta-flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .beta-flag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-secondary);
+  }
+  .beta-flag-good {
+    background: rgba(16, 185, 129, 0.1);
+    color: rgb(16, 185, 129);
+  }
+  .beta-flag-bad {
+    background: rgba(239, 68, 68, 0.08);
+    color: rgb(220, 38, 38);
+  }
 
   /* ===== INPUT AREA ===== */
   .input-area {
@@ -1211,6 +1234,21 @@ const betaSession = {
   deliverableCount: 0,
   urlsFetched: [],
   fetchErrors: [],
+
+  // === CONVERSATION CONTENT ANALYSIS ===
+  conversationInsights: {
+    userIntents: [],         // What the user wanted at each message
+    repeatedAsks: [],        // Things the user had to ask more than once
+    frustrationSignals: [],  // Messages showing confusion, frustration, repetition
+    delightSignals: [],      // Messages showing satisfaction, excitement, surprise
+    wowMoments: [],          // When FigStudio delivered unexpected value
+    missionDetected: null,   // Create / Refine / Rebuild / etc.
+    topicFlow: [],           // Topic progression through conversation
+    unansweredNeeds: [],     // Things user asked that weren't addressed
+    valueDelivered: [],      // Concrete things FigStudio produced or taught
+    aiIssues: [],            // Hallucinations, wrong tone, preamble leaks, etc.
+  },
+
   pulseSchedule: [
     { trigger: 'message_3', question: 'How natural does this conversation feel so far?', options: ['Very natural', 'Mostly natural', 'A bit robotic', 'Unnatural'] },
     { trigger: 'after_analysis', question: 'Was the website analysis useful?', options: ['Very useful', 'Somewhat useful', 'Not very useful', 'Confusing'] },
@@ -1220,6 +1258,173 @@ const betaSession = {
   ],
   pulsesShown: new Set()
 };
+
+// ===== CONVERSATION CONTENT ANALYZER =====
+// Analyzes WHAT users say, not just HOW they interact
+
+function analyzeUserMessage(text, messageNum) {
+  if (!BETA_TESTING) return;
+  const lower = text.toLowerCase();
+  const insights = betaSession.conversationInsights;
+
+  // --- INTENT DETECTION ---
+  const intent = detectIntent(lower, text);
+  insights.userIntents.push({ message: messageNum, intent, text: text.substring(0, 200) });
+
+  // --- MISSION DETECTION (first few messages) ---
+  if (messageNum <= 3 && !insights.missionDetected) {
+    if (/(?:crear|create|build|nueva|new|from scratch|desde cero)/i.test(text)) insights.missionDetected = 'Create';
+    else if (/(?:update|actualizar|mejorar|improve|refine|fix|arreglar|change)/i.test(text)) insights.missionDetected = 'Refine';
+    else if (/(?:rebuild|redesign|rediseñar|overhaul|redo)/i.test(text)) insights.missionDetected = 'Rebuild';
+    else if (/(?:launch|lanzar|market|promocionar|sell)/i.test(text)) insights.missionDetected = 'Launch';
+  }
+
+  // --- TOPIC TRACKING ---
+  const topic = detectTopic(lower);
+  if (topic) insights.topicFlow.push({ message: messageNum, topic });
+
+  // --- FRUSTRATION SIGNALS ---
+  const frustration = detectFrustration(lower, text, messageNum);
+  if (frustration) insights.frustrationSignals.push(frustration);
+
+  // --- DELIGHT SIGNALS ---
+  const delight = detectDelight(lower, text, messageNum);
+  if (delight) insights.delightSignals.push(delight);
+
+  // --- REPEATED ASK DETECTION ---
+  detectRepeatedAsk(lower, text, messageNum, insights);
+}
+
+function analyzeAssistantResponse(text, messageNum) {
+  if (!BETA_TESTING) return;
+  const lower = text.toLowerCase();
+  const insights = betaSession.conversationInsights;
+
+  // --- VALUE DELIVERY TRACKING ---
+  const value = detectValueDelivered(lower, text, messageNum);
+  if (value.length > 0) insights.valueDelivered.push(...value);
+
+  // --- AI ISSUE DETECTION ---
+  const issues = detectAiIssues(lower, text, messageNum);
+  if (issues.length > 0) insights.aiIssues.push(...issues);
+
+  // --- WOW MOMENT DETECTION ---
+  // A wow moment is when the AI surfaces something the user didn't ask for
+  if (/(?:you might not have noticed|you hadn't thought|bonus|by the way|also noticed|opportunity|missed opportunity|oportunidad)/i.test(text)) {
+    insights.wowMoments.push({ message: messageNum, type: 'unsolicited_insight', snippet: text.substring(0, 150) });
+  }
+}
+
+function detectIntent(lower, text) {
+  if (/https?:\/\//.test(text)) return 'shared_url';
+  if (/(?:what (?:do i|should i|can i)|qué (?:hago|necesito|puedo)|how (?:do i|does)|cómo)/i.test(text)) return 'asking_how';
+  if (/(?:show me|muéstrame|mockup|preview|diseño|design|visual)/i.test(text)) return 'wants_visual';
+  if (/(?:document|documento|proposal|propuesta|one-?pager|pdf)/i.test(text)) return 'wants_deliverable';
+  if (/(?:price|precio|cost|cuánto|how much|cobrar|charge|budget|presupuesto)/i.test(text)) return 'asking_price';
+  if (/(?:client|cliente|told me|me dijo|asked me|me pidió)/i.test(text)) return 'sharing_client_context';
+  if (/(?:no|wrong|incorrect|that's not|eso no|mal|error|fake|inventado)/i.test(text)) return 'correcting_ai';
+  if (/(?:yes|sí|si|perfect|perfecto|great|genial|exactly|exacto|good|bien|ok|vale)/i.test(text) && text.length < 50) return 'confirming';
+  if (/(?:change|cambiar|modify|modificar|adjust|ajustar|different|diferente|otro|another)/i.test(text)) return 'requesting_change';
+  if (/(?:help|ayuda|stuck|atascado|confused|no entiendo|don't understand)/i.test(text)) return 'asking_help';
+  if (/(?:who|quién|about|sobre|what is|qué es)/i.test(text) && text.length < 80) return 'asking_info';
+  return 'general';
+}
+
+function detectTopic(lower) {
+  if (/(?:seo|google|ranking|position|búsqueda|search)/.test(lower)) return 'SEO';
+  if (/(?:design|diseño|color|font|layout|visual|look|aspecto)/.test(lower)) return 'design';
+  if (/(?:content|contenido|copy|text|texto|message|mensaje)/.test(lower)) return 'content';
+  if (/(?:mobile|móvil|responsive|phone|celular)/.test(lower)) return 'mobile';
+  if (/(?:price|precio|cost|cuánto|budget|presupuesto|money|dinero)/.test(lower)) return 'pricing';
+  if (/(?:competitor|competencia|competition|rival)/.test(lower)) return 'competition';
+  if (/(?:google business|google maps|reseñas|reviews|rating)/.test(lower)) return 'local_seo';
+  if (/(?:blog|article|artículo|post|noticias|news)/.test(lower)) return 'blog';
+  if (/(?:photo|foto|image|imagen|video|gallery|galería)/.test(lower)) return 'media';
+  if (/(?:mockup|prototype|prototipo|preview|demo)/.test(lower)) return 'mockup';
+  if (/(?:document|documento|proposal|propuesta|pitch|presentation)/.test(lower)) return 'deliverable';
+  return null;
+}
+
+function detectFrustration(lower, text, messageNum) {
+  // Explicit frustration
+  if (/(?:no(?:,| )|that's wrong|eso no|mal|incorrect|nope|not what|no es lo que)/i.test(text)) {
+    return { message: messageNum, type: 'correction', text: text.substring(0, 150) };
+  }
+  // Repetition (short message that repeats a previous intent)
+  if (text.length < 30 && /(?:\?|por favor|please|again|otra vez|de nuevo)/i.test(text)) {
+    return { message: messageNum, type: 'repeating_request', text: text.substring(0, 150) };
+  }
+  // Question marks in short messages (confusion)
+  if (text.length < 40 && (text.match(/\?/g) || []).length >= 1 && !/https?:\/\//.test(text)) {
+    return { message: messageNum, type: 'confusion', text: text.substring(0, 150) };
+  }
+  return null;
+}
+
+function detectDelight(lower, text, messageNum) {
+  if (/(?:wow|amazing|increíble|genial|perfect|perfecto|love it|me encanta|impressive|great|awesome|excellent|excelente|brutal|fantástico)/i.test(text)) {
+    return { message: messageNum, type: 'explicit_delight', text: text.substring(0, 150) };
+  }
+  if (/(?:exactly|exacto|that's it|eso es|this is what|justo lo que|nailed it)/i.test(text)) {
+    return { message: messageNum, type: 'validation', text: text.substring(0, 150) };
+  }
+  // Long enthusiastic follow-up (user engaged deeply)
+  if (text.length > 200 && !/(?:no |wrong|mal |error)/i.test(text)) {
+    return { message: messageNum, type: 'deep_engagement', text: text.substring(0, 150) };
+  }
+  return null;
+}
+
+function detectRepeatedAsk(lower, text, messageNum, insights) {
+  // Compare intent with previous intents
+  const currentIntent = detectIntent(lower, text);
+  const previousSameIntent = insights.userIntents.filter(i => i.intent === currentIntent && i.message < messageNum);
+  if (previousSameIntent.length > 0 && currentIntent !== 'general' && currentIntent !== 'confirming') {
+    insights.repeatedAsks.push({
+      message: messageNum,
+      intent: currentIntent,
+      previousMessage: previousSameIntent[previousSameIntent.length - 1].message,
+      text: text.substring(0, 150)
+    });
+  }
+}
+
+function detectValueDelivered(lower, text, messageNum) {
+  const values = [];
+  if (/```html-deliverable/.test(text)) values.push({ message: messageNum, type: 'deliverable_created' });
+  if (/(?:## |section|diagnos|analysis|análisis)/i.test(text) && text.length > 500) values.push({ message: messageNum, type: 'deep_analysis' });
+  if (/(?:portfolio|caso de estudio|case study)/i.test(text)) values.push({ message: messageNum, type: 'portfolio_advice' });
+  if (/(?:price|precio|€|eur|cobrar|charge|quote|presupuesto)/i.test(text) && text.length > 100) values.push({ message: messageNum, type: 'pricing_guidance' });
+  if (/(?:google business|google maps|local seo)/i.test(text)) values.push({ message: messageNum, type: 'local_seo_advice' });
+  if (/(?:competitor|competencia|competition)/i.test(text) && text.length > 200) values.push({ message: messageNum, type: 'competitive_analysis' });
+  if (/(?:mockup|diseño|redesign|rediseño)/i.test(text) && /```html-deliverable/.test(text)) values.push({ message: messageNum, type: 'visual_mockup' });
+  return values;
+}
+
+function detectAiIssues(lower, text, messageNum) {
+  const issues = [];
+  // Preamble detection
+  if (/^(?:i'd be happy|i'll analyze|let me (?:take a look|analyze)|voy a analizar|déjame ver)/i.test(text.trim())) {
+    issues.push({ message: messageNum, type: 'preamble_leak', snippet: text.substring(0, 80) });
+  }
+  // Web fetch tag leak
+  if (/<web_fetch>|<\/web_fetch>/i.test(text)) {
+    issues.push({ message: messageNum, type: 'web_fetch_tag_leak' });
+  }
+  // Menu/list dump in early conversation (first 3 assistant messages)
+  if (messageNum <= 6 && (text.match(/^- /gm) || []).length > 4) {
+    issues.push({ message: messageNum, type: 'early_bullet_dump', bulletCount: (text.match(/^- /gm) || []).length });
+  }
+  // Possible name hallucination: AI mentions Dr./Dra. names not present in tool data
+  if (/(?:Dr\.?|Dra\.?)\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+/i.test(text)) {
+    issues.push({ message: messageNum, type: 'possible_name_mention', snippet: text.match(/(?:Dr\.?|Dra\.?)\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2}/i)?.[0] || '' });
+  }
+  // Overly long early response
+  if (messageNum <= 4 && text.length > 800 && !/```html-deliverable/.test(text)) {
+    issues.push({ message: messageNum, type: 'early_response_too_long', length: text.length });
+  }
+  return issues;
+}
 
 function betaLog(eventType, data = {}) {
   if (!BETA_TESTING) return;
@@ -1323,6 +1528,11 @@ function generateBetaReport() {
     ? betaSession.messageTimings.reduce((s, t) => s + t.gap, 0) / betaSession.messageTimings.length
     : 0;
 
+  // Build conversation content analysis summary
+  const ci = betaSession.conversationInsights;
+  const intentSummary = {};
+  ci.userIntents.forEach(i => { intentSummary[i.intent] = (intentSummary[i.intent] || 0) + 1; });
+
   const report = {
     sessionId: betaSession.id,
     userName: betaSession.userName,
@@ -1338,6 +1548,35 @@ function generateBetaReport() {
     averageResponseTime: Math.round(avgTiming / 1000) + 's',
     messageTimings: betaSession.messageTimings,
     pulseResponses: betaSession.pulseResponses,
+
+    // === CONVERSATION CONTENT ANALYSIS ===
+    conversationAnalysis: {
+      missionDetected: ci.missionDetected,
+      intentBreakdown: intentSummary,
+      topicFlow: ci.topicFlow,
+      repeatedAsks: ci.repeatedAsks,
+      frustrationSignals: ci.frustrationSignals,
+      delightSignals: ci.delightSignals,
+      wowMoments: ci.wowMoments,
+      valueDelivered: ci.valueDelivered,
+      aiIssues: ci.aiIssues,
+      // High-level summary flags
+      userHadToCorrectAI: ci.frustrationSignals.some(f => f.type === 'correction'),
+      userRepeatedRequests: ci.repeatedAsks.length > 0,
+      userExpressedDelight: ci.delightSignals.length > 0,
+      aiHallucinationRisk: ci.aiIssues.some(i => i.type === 'possible_name_mention'),
+      aiPreambleLeaked: ci.aiIssues.some(i => i.type === 'preamble_leak'),
+      topicsExplored: [...new Set(ci.topicFlow.map(t => t.topic))],
+      valueTypes: [...new Set(ci.valueDelivered.map(v => v.type))],
+    },
+
+    // === FULL CONVERSATION TRANSCRIPT ===
+    conversation: conversationHistory.map((msg, i) => ({
+      role: msg.role,
+      content: msg.content.substring(0, 2000), // Truncate very long messages
+      messageIndex: i
+    })),
+
     eventLog: betaSession.events,
     conversationLength: conversationHistory.length,
     timestamp: new Date().toISOString()
@@ -1377,6 +1616,16 @@ function showBetaReport() {
     const container = document.getElementById('chatMessages');
     const div = document.createElement('div');
     div.className = 'beta-report';
+    const ca = report.conversationAnalysis;
+    const flagsHtml = [
+      ca.missionDetected ? `<span class="beta-flag">Mission: ${ca.missionDetected}</span>` : '',
+      ca.userExpressedDelight ? '<span class="beta-flag beta-flag-good">😊 User delighted</span>' : '',
+      ca.userHadToCorrectAI ? '<span class="beta-flag beta-flag-bad">⚠️ User corrected AI</span>' : '',
+      ca.userRepeatedRequests ? '<span class="beta-flag beta-flag-bad">🔁 Repeated asks</span>' : '',
+      ca.aiHallucinationRisk ? '<span class="beta-flag beta-flag-bad">👤 Name mention (check)</span>' : '',
+      ca.aiPreambleLeaked ? '<span class="beta-flag beta-flag-bad">💬 Preamble leaked</span>' : '',
+    ].filter(Boolean).join(' ');
+
     div.innerHTML = `
       <div class="beta-report-content">
         <div class="beta-report-title">📊 Beta Session Report</div>
@@ -1385,23 +1634,138 @@ function showBetaReport() {
           <div class="beta-stat"><span class="beta-stat-value">${report.totalMessages}</span><span class="beta-stat-label">Messages</span></div>
           <div class="beta-stat"><span class="beta-stat-value">${report.deliverableCount}</span><span class="beta-stat-label">Deliverables</span></div>
           <div class="beta-stat"><span class="beta-stat-value">${report.averageResponseTime}</span><span class="beta-stat-label">Avg gap</span></div>
-          <div class="beta-stat"><span class="beta-stat-value">${report.featuresUsed.length}</span><span class="beta-stat-label">Features used</span></div>
-          <div class="beta-stat"><span class="beta-stat-value">${report.modeChanges.length}</span><span class="beta-stat-label">Mode switches</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${ca.topicsExplored.length}</span><span class="beta-stat-label">Topics</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${ca.valueTypes.length}</span><span class="beta-stat-label">Value types</span></div>
         </div>
+
+        <div class="beta-report-section">
+          <strong>Session flags:</strong>
+          <div class="beta-flags">${flagsHtml || '<span class="beta-flag">Clean session</span>'}</div>
+        </div>
+
+        ${ca.topicsExplored.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>Topics explored:</strong> ${ca.topicsExplored.join(' → ')}
+        </div>` : ''}
+
+        ${ca.valueTypes.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>Value delivered:</strong> ${ca.valueTypes.map(v => v.replace(/_/g, ' ')).join(', ')}
+        </div>` : ''}
+
+        ${ca.frustrationSignals.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>⚠️ Friction points:</strong>
+          ${ca.frustrationSignals.map(f => `<div class="beta-feedback-item">[msg ${f.message}] ${f.type}: "${f.text}"</div>`).join('')}
+        </div>` : ''}
+
+        ${ca.delightSignals.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>😊 Delight moments:</strong>
+          ${ca.delightSignals.map(d => `<div class="beta-feedback-item">[msg ${d.message}] ${d.type}: "${d.text}"</div>`).join('')}
+        </div>` : ''}
+
+        ${ca.repeatedAsks.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>🔁 Repeated asks (user had to ask again):</strong>
+          ${ca.repeatedAsks.map(r => `<div class="beta-feedback-item">[msg ${r.message}] ${r.intent} (first asked at msg ${r.previousMessage})</div>`).join('')}
+        </div>` : ''}
+
+        ${ca.aiIssues.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>🐛 AI issues detected:</strong>
+          ${ca.aiIssues.map(i => `<div class="beta-feedback-item">[msg ${i.message}] ${i.type}${i.snippet ? `: "${i.snippet}"` : ''}</div>`).join('')}
+        </div>` : ''}
+
         ${report.pulseResponses.length > 0 ? `
         <div class="beta-report-section">
-          <strong>Feedback collected:</strong>
+          <strong>User feedback:</strong>
           ${report.pulseResponses.map(p => `<div class="beta-feedback-item">"${p.answer}" — ${p.trigger}${p.comment ? ` (${p.comment})` : ''}</div>`).join('')}
         </div>` : ''}
+
         <div class="beta-report-actions">
-          <button class="beta-report-btn" onclick="exportBetaReport()">📥 Export JSON</button>
+          <button class="beta-report-btn" onclick="exportBetaReport()">📥 Export this session</button>
           <button class="beta-report-btn" onclick="navigator.clipboard.writeText(JSON.stringify(generateBetaReport(), null, 2)).then(() => this.textContent = 'Copied!')">📋 Copy to clipboard</button>
+          <button class="beta-report-btn" onclick="exportAllBetaSessions()">📦 Export all sessions (${getAllBetaSessions().length})</button>
+        </div>
+        <div class="beta-report-section" style="margin-top:8px; font-size:11px; opacity:0.6;">
+          Auto-saved to browser. ${getAllBetaSessions().length} session(s) stored. Data persists across sessions.
         </div>
       </div>
     `;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
   }, betaSession.pulsesShown.has('end_session') ? 0 : 3000);
+}
+
+// ===== AUTO-SAVE (never lose beta data) =====
+let betaAutoSaveInterval = null;
+
+function betaAutoSave() {
+  if (!BETA_TESTING || !betaSession.startTime) return;
+  try {
+    const report = generateBetaReport();
+    if (!report) return;
+    // Save to localStorage with session ID as key
+    localStorage.setItem(`figstudio-beta-${betaSession.id}`, JSON.stringify(report));
+    // Also maintain an index of all sessions
+    const sessions = JSON.parse(localStorage.getItem('figstudio-beta-sessions') || '[]');
+    const existing = sessions.findIndex(s => s.id === betaSession.id);
+    const entry = {
+      id: betaSession.id,
+      userName: betaSession.userName,
+      timestamp: new Date().toISOString(),
+      messageCount: userMessageCount,
+      duration: Math.round((Date.now() - betaSession.startTime) / 1000)
+    };
+    if (existing >= 0) sessions[existing] = entry;
+    else sessions.push(entry);
+    localStorage.setItem('figstudio-beta-sessions', JSON.stringify(sessions));
+  } catch(e) {
+    // localStorage full or unavailable — silent fail
+  }
+}
+
+function startBetaAutoSave() {
+  if (!BETA_TESTING) return;
+  // Save every 30 seconds
+  betaAutoSaveInterval = setInterval(betaAutoSave, 30000);
+
+  // Save when page becomes hidden (user switches tab or minimizes)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) betaAutoSave();
+  });
+
+  // Save on page close/navigate
+  window.addEventListener('beforeunload', () => {
+    betaAutoSave();
+  });
+
+  // Save on any page unload event (mobile browsers)
+  window.addEventListener('pagehide', () => {
+    betaAutoSave();
+  });
+}
+
+// Function to retrieve all saved beta sessions (for analysis)
+function getAllBetaSessions() {
+  const sessions = JSON.parse(localStorage.getItem('figstudio-beta-sessions') || '[]');
+  return sessions.map(s => {
+    const data = JSON.parse(localStorage.getItem(`figstudio-beta-${s.id}`) || 'null');
+    return { ...s, data };
+  }).filter(s => s.data);
+}
+
+// Function to export ALL saved sessions as a single JSON
+function exportAllBetaSessions() {
+  const allSessions = getAllBetaSessions();
+  const blob = new Blob([JSON.stringify(allSessions, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `figstudio-beta-all-sessions-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ===== SETUP =====
@@ -1413,6 +1777,7 @@ async function startSession() {
   betaSession.startTime = Date.now();
   betaSession.userName = name;
   betaLog('session_start', { userName: name });
+  startBetaAutoSave();
 
   document.getElementById('setupOverlay').style.display = 'none';
 
@@ -1597,6 +1962,7 @@ async function sendMessage() {
   userMessageCount++;
   betaTrackTiming();
   betaLog('user_message', { messageNumber: userMessageCount, hasUrl: /https?:\/\//.test(text), length: text.length });
+  analyzeUserMessage(text, userMessageCount);
 
   isStreaming = true;
   document.getElementById('sendBtn').disabled = true;
@@ -1642,6 +2008,8 @@ async function sendMessage() {
     addMessage('assistant', response);
     conversationHistory.push({ role: 'assistant', content: response });
     betaLog('assistant_response', { length: response.length, hasDeliverable: /```html-deliverable/.test(response) });
+    analyzeAssistantResponse(response, conversationHistory.length);
+    betaAutoSave(); // Save after every exchange — never lose data
 
     // Show mode discovery hint after 3rd user message (once only)
     if (userMessageCount === 3 && !modeHintShown) {
