@@ -1412,10 +1412,6 @@ function detectAiIssues(lower, text, messageNum) {
   if (/<web_fetch>|<\/web_fetch>/i.test(text)) {
     issues.push({ message: messageNum, type: 'web_fetch_tag_leak' });
   }
-  // Menu/list dump in early conversation (first 3 assistant messages)
-  if (messageNum <= 6 && (text.match(/^- /gm) || []).length > 4) {
-    issues.push({ message: messageNum, type: 'early_bullet_dump', bulletCount: (text.match(/^- /gm) || []).length });
-  }
   // Possible name hallucination: AI mentions Dr./Dra. names not present in tool data
   if (/(?:Dr\.?|Dra\.?)\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+/i.test(text)) {
     issues.push({ message: messageNum, type: 'possible_name_mention', snippet: text.match(/(?:Dr\.?|Dra\.?)\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,2}/i)?.[0] || '' });
