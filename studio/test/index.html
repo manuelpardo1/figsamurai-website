@@ -1448,6 +1448,13 @@ TRUST & REVIEW SIGNALS:
 - Reviews/testimonials section: ${htmlLower.includes('review') || htmlLower.includes('testimonial') || htmlLower.includes('opinion') || htmlLower.includes('reseña') ? 'Possibly present' : 'Not detected'}
 - Has Google Maps embed: ${htmlLower.includes('maps.google') || htmlLower.includes('google.com/maps') ? 'Yes' : 'No'}
 
+GOOGLE BUSINESS & LOCAL SEO SIGNALS:
+- Google Maps embed on page: ${htmlLower.includes('maps.google') || htmlLower.includes('google.com/maps') || htmlLower.includes('maps.googleapis') ? 'Yes' : 'No'}
+- Google Business link on page: ${htmlLower.includes('google.com/maps/place') || htmlLower.includes('business.google') || htmlLower.includes('g.page') ? 'Yes — links to Google Business profile' : 'No link to Google Business profile found'}
+- Review platform links: ${[...(htmlLower.includes('doctoralia') ? ['Doctoralia'] : []), ...(htmlLower.includes('yelp') ? ['Yelp'] : []), ...(htmlLower.includes('tripadvisor') ? ['TripAdvisor'] : []), ...(htmlLower.includes('trustpilot') ? ['Trustpilot'] : []), ...(htmlLower.includes('google.com/maps') ? ['Google Maps'] : [])].join(', ') || 'None detected'}
+- Local business schema (LocalBusiness JSON-LD): ${html.includes('LocalBusiness') || html.includes('Dentist') || html.includes('MedicalBusiness') || html.includes('Restaurant') || html.includes('Store') ? 'Yes' : 'No'}
+- NOTE: This analysis can only detect what's ON the website. The business may have a Google Business Profile that isn't linked from the site — that's a missed opportunity worth investigating.
+
 BODY TEXT (first 3000 chars):
 ${bodyText.substring(0, 3000)}
     `.trim();
