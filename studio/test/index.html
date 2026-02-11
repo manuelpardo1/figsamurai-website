@@ -1009,7 +1009,7 @@ async function startSession() {
   systemPrompt += `\n\n## Tools available in this session\n\nYou have access to a web_fetch tool. When the user shares a website URL, the platform will automatically fetch the page HTML and provide it to you as context. You can then analyze the site for technology stack, content, structure, SEO signals, and more.\n\nThe user's name is: ${USER_NAME}\n\n## Generating visual output\n\nYou can generate TWO types of visual output that render live in the Preview panel:\n\n### 1. Deliverables (documents for the client)\nOne-pagers, full documents, email pitches, slide decks. Output the COMPLETE HTML inside a code block with the language tag \`\`\`html-deliverable. Requirements:\n- Self-contained with all CSS inline or in a <style> block\n- Use A4 dimensions (210mm x 297mm) for print-ready documents\n- Print-ready CSS (@page, print-color-adjust)\n- Import fonts from Google Fonts CDN\n- The deliverable must be COMPLETE and BEAUTIFUL — this is the user's output for their client\n- Include the attribution line at the bottom: "Preparado por ${USER_NAME} · Powered by FigStudio"\n\n### 2. Website mockups (visual design previews)\nWhen the user wants to see what the new or improved website could look like, generate a FULL HTML page that serves as a visual mockup. Use the same \`\`\`html-deliverable code block — the Preview panel will render it identically.\n\nFor website mockups:\n- Build a complete, realistic-looking page — not a wireframe. It should look like a real website.\n- Use modern design patterns, clean typography, good spacing\n- Include placeholder content that matches the client's actual business (real service names, realistic copy, appropriate imagery via placeholder services or CSS gradients/shapes)\n- Make it responsive-looking within the preview\n- Use the client's actual brand colors if known, or propose a professional palette\n- Include all key sections: hero, services, reviews/trust signals, contact, footer\n- The user can ask for different styles, variations, or specific changes — each new version replaces the previous one in Preview\n- This is NOT the final website — it's a visual concept to help the user and their client align on direction before building\n\nThe mockup capability is powerful: the user can say "show me what the new homepage could look like" and you produce a complete visual design in seconds. They can then iterate: "make it more modern", "try a different color scheme", "add a reviews section." Each iteration renders live.`;
 
   // Reinforce conversation rules at the end (recency bias — model weighs end of prompt heavily)
-  systemPrompt += `\n\n## REMEMBER — conversation rules (non-negotiable)\n\n- Your early responses must be 1-2 sentences. No bullet lists, no roadmaps, no previewing what you'll do.\n- If the user already told you what they need, don't repeat it back. Just ask for the ONE thing you're missing (usually: the URL).\n- BAD: "I'd be happy to help! I'll analyze design, SEO, content, performance..." → This is filler. Stop.\n- GOOD: "Sure — drop me the URL and I'll take a look right now." → This is FigStudio.\n- The depth comes AFTER you have data, not before.`;
+  systemPrompt += `\n\n## REMEMBER — conversation rules (non-negotiable)\n\n- Your early responses must be 1-2 sentences. No bullet lists, no roadmaps, no previewing what you'll do.\n- If the user already told you what they need, don't repeat it back. Just ask for the ONE thing you're missing (usually: the URL).\n- BAD: "I'd be happy to help! I'll analyze design, SEO, content, performance..." → This is filler. Stop.\n- GOOD: "Sure — drop me the URL and I'll take a look right now." → This is FigStudio.\n- The depth comes AFTER you have data, not before.\n- NEVER INVENT NAMES. Do not generate doctor names, owner names, staff names, or any person's name unless it appears verbatim in the tool data or the user told you. Use "the clinic", "the business", "the owner" instead. This is a trust-destroying error — the user will show this to their client.`;
 
   // Add mode behavior instructions
   systemPrompt += getModeInstructions();
@@ -1150,7 +1150,7 @@ async function sendMessage() {
         if (urlData) {
           enhancedMessages.push({
             role: 'user',
-            content: `[FigStudio tool result — web_fetch for ${urlMatch[0]}]\n\nPage title: ${urlData.title}\nMeta description: ${urlData.description}\nTechnology signals: ${urlData.tech}\n\n${urlData.content}\n\n[End of tool result. Now analyze this site and respond to the user naturally. Remember: you're FigStudio Advisor. Be specific, diagnostic, and actionable. If this is a Refine case, demonstrate immediate understanding and add something they hadn't thought of.]`
+            content: `[FigStudio tool result — web_fetch for ${urlMatch[0]}]\n\nPage title: ${urlData.title}\nMeta description: ${urlData.description}\nTechnology signals: ${urlData.tech}\n\n${urlData.content}\n\n[End of tool result. CRITICAL: Only use facts from the data above. Do NOT invent any person names, doctor names, owner names, or staff names — if no name appears in the data above, say "the business" or "the clinic" instead. If you need a name, ask the user. Now analyze this site and respond naturally.]`
           });
         }
       } catch(e) {
@@ -1563,7 +1563,17 @@ async function fetchUrl(url) {
       navSignals.push('Appears to be a single-page site (mostly anchor links, few actual subpages)');
     }
 
+    // ===== PERSON/NAME DETECTION =====
+    // Extract names explicitly mentioned on the page (Dr., Dra., etc.)
+    const namePatterns = bodyText.match(/(?:Dr\.?|Dra\.?|Doctor|Doctora|Prof\.?|Lic\.?)\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,3}/g) || [];
+    const uniqueNames = [...new Set(namePatterns)].slice(0, 5);
+
     const content = `
+⚠️ IMPORTANT: Only reference names that appear in this data. If no person names are listed below, do NOT invent any. Use "the business", "the clinic", "the owner" instead.
+
+PERSON NAMES FOUND ON PAGE:
+${uniqueNames.length > 0 ? uniqueNames.map(n => `- ${n}`).join('\n') : '- NONE FOUND. Do not invent or guess any names.'}
+
 SITE STRUCTURE:
 - Internal links: ${internalLinks.length}
 - Total images: ${images.length}
