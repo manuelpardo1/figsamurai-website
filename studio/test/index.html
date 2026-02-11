@@ -211,6 +211,74 @@
     color: var(--text);
   }
 
+  /* ===== MESSAGE ACTIONS ===== */
+  .msg-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .msg:hover .msg-actions,
+  .msg-actions.visible {
+    opacity: 1;
+  }
+
+  .msg-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-subtle);
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .msg-action-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+
+  .msg-action-btn.copied {
+    color: var(--green);
+  }
+
+  /* ===== STOP BUTTON ===== */
+  .stop-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    margin: 0 auto 8px;
+    transition: all 0.15s;
+  }
+
+  .stop-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+    border-color: var(--border-light);
+  }
+
+  .stop-btn.active {
+    display: flex;
+  }
+
   /* ===== THINKING INDICATOR ===== */
   .thinking {
     display: flex;
@@ -850,6 +918,10 @@
   <div class="chat-panel">
     <div class="chat-messages" id="chatMessages"></div>
     <div class="input-area">
+      <button class="stop-btn" id="stopBtn" onclick="stopGeneration()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+        Stop
+      </button>
       <div class="input-box">
         <textarea id="userInput" rows="1" placeholder="Tell me what you need..." oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
@@ -967,7 +1039,18 @@ function addMessage(role, content) {
         FigStudio
       </div>
       <div class="msg-body">${renderMarkdown(content)}</div>
+      <div class="msg-actions">
+        <button class="msg-action-btn" onclick="copyMessage(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy
+        </button>
+      </div>
     `;
+    // Store raw text for copy
+    div.dataset.rawContent = content;
   } else {
     div.innerHTML = `<div class="msg-body">${escapeHtml(content)}</div>`;
   }
@@ -1049,6 +1132,10 @@ async function sendMessage() {
 
   isStreaming = true;
   document.getElementById('sendBtn').disabled = true;
+  document.getElementById('stopBtn').classList.add('active');
+
+  // Create abort controller for this request
+  currentAbortController = new AbortController();
 
   try {
     // Check for URL in the message — fetch it first
@@ -1081,12 +1168,18 @@ async function sendMessage() {
   } catch(err) {
     removeThinking();
     removeUrlAnalysis();
-    showError(text);
-    console.error('FigStudio error:', err);
+    if (err.name === 'AbortError') {
+      // User stopped — don't show error, just clean up
+    } else {
+      showError(text);
+      console.error('FigStudio error:', err);
+    }
   }
 
+  currentAbortController = null;
   isStreaming = false;
   document.getElementById('sendBtn').disabled = false;
+  document.getElementById('stopBtn').classList.remove('active');
   input.focus();
 }
 
@@ -1135,6 +1228,57 @@ function retryLastMessage(btn) {
   sendMessage();
 }
 
+// ===== COPY MESSAGE =====
+function copyMessage(btn) {
+  const msg = btn.closest('.msg');
+  const raw = msg.dataset.rawContent;
+  if (!raw) return;
+
+  // Strip deliverable code blocks from copied text
+  const cleanText = raw.replace(/```html-deliverable\n[\s\S]*?```/g, '[Deliverable — see Preview panel]');
+
+  navigator.clipboard.writeText(cleanText).then(() => {
+    btn.classList.add('copied');
+    const label = btn.querySelector('svg').nextSibling;
+    const originalText = btn.textContent.trim();
+    btn.innerHTML = btn.innerHTML.replace('Copy', 'Copied');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = btn.innerHTML.replace('Copied', 'Copy');
+    }, 1500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = cleanText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.innerHTML = btn.innerHTML.replace('Copy', 'Copied');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = btn.innerHTML.replace('Copied', 'Copy');
+    }, 1500);
+  });
+}
+
+// ===== STOP GENERATION =====
+let currentAbortController = null;
+
+function stopGeneration() {
+  if (currentAbortController) {
+    currentAbortController.abort();
+    currentAbortController = null;
+  }
+  removeThinking();
+  removeUrlAnalysis();
+  isStreaming = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('stopBtn').classList.remove('active');
+  document.getElementById('userInput').focus();
+}
+
 // ===== CLAUDE API (via backend proxy) =====
 async function callClaude(messages) {
   // Inject current mode behavior into system prompt
@@ -1153,7 +1297,8 @@ async function callClaude(messages) {
       max_tokens: 8192,
       system: currentSystem,
       messages: messages
-    })
+    }),
+    signal: currentAbortController?.signal
   });
 
   if (!resp.ok) {
