@@ -1242,7 +1242,7 @@ const betaSession = {
     frustrationSignals: [],  // Messages showing confusion, frustration, repetition
     delightSignals: [],      // Messages showing satisfaction, excitement, surprise
     wowMoments: [],          // When FigStudio delivered unexpected value
-    missionDetected: null,   // Create / Refine / Rebuild / etc.
+    missionDetected: null,   // Create / Refine / Rebuild / Defend / Launch
     topicFlow: [],           // Topic progression through conversation
     unansweredNeeds: [],     // Things user asked that weren't addressed
     valueDelivered: [],      // Concrete things FigStudio produced or taught
@@ -1274,9 +1274,10 @@ function analyzeUserMessage(text, messageNum) {
   // --- MISSION DETECTION (first few messages) ---
   if (messageNum <= 3 && !insights.missionDetected) {
     if (/(?:crear|create|build|nueva|new|from scratch|desde cero)/i.test(text)) insights.missionDetected = 'Create';
-    else if (/(?:update|actualizar|mejorar|improve|refine|fix|arreglar|change)/i.test(text)) insights.missionDetected = 'Refine';
-    else if (/(?:rebuild|redesign|rediseñar|overhaul|redo)/i.test(text)) insights.missionDetected = 'Rebuild';
-    else if (/(?:launch|lanzar|market|promocionar|sell)/i.test(text)) insights.missionDetected = 'Launch';
+    else if (/(?:rebuild|redesign|rediseñar|overhaul|redo|rehac)/i.test(text)) insights.missionDetected = 'Rebuild';
+    else if (/(?:defend|disrupt|pivot|threat|amenaza|competencia.*nueva|new competitor|losing market|perdiendo mercado|survive|sobrevivir|reinvent|reinventar)/i.test(text)) insights.missionDetected = 'Defend';
+    else if (/(?:launch|lanzar|market|promocionar|sell|go live|salir al mercado)/i.test(text)) insights.missionDetected = 'Launch';
+    else if (/(?:update|actualizar|mejorar|improve|refine|fix|arreglar|change|tweak|adjust)/i.test(text)) insights.missionDetected = 'Refine';
   }
 
   // --- TOPIC TRACKING ---
