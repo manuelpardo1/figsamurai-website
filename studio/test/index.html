@@ -343,6 +343,198 @@
     font-weight: 500;
   }
 
+  /* Mode discovery hint */
+  .mode-hint {
+    margin: 8px 0;
+    animation: msgIn 0.3s ease-out;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .mode-hint-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, rgba(166, 124, 82, 0.06), rgba(166, 124, 82, 0.12));
+    border: 1px solid rgba(166, 124, 82, 0.15);
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  .mode-hint-content svg {
+    flex-shrink: 0;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+  .mode-hint-content strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .mode-hint-dismiss {
+    flex-shrink: 0;
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .mode-hint-dismiss:hover {
+    opacity: 1;
+  }
+
+  /* Beta testing pulse & report */
+  .beta-pulse {
+    margin: 8px 0;
+    animation: msgIn 0.3s ease-out;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .beta-pulse-content {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.10));
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: var(--radius-sm);
+  }
+  .beta-pulse-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(59, 130, 246, 0.7);
+    margin-bottom: 6px;
+  }
+  .beta-pulse-question {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .beta-pulse-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    transition: opacity 0.3s;
+  }
+  .beta-pulse-option {
+    padding: 5px 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 16px;
+    background: white;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .beta-pulse-option:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    color: rgb(59, 130, 246);
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .beta-pulse-option.selected {
+    border-color: rgb(59, 130, 246);
+    background: rgba(59, 130, 246, 0.1);
+    color: rgb(59, 130, 246);
+    font-weight: 600;
+  }
+  .beta-pulse-option:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  .beta-pulse-comment {
+    width: 100%;
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: var(--radius-xs);
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    resize: none;
+    transition: height 0.2s;
+    outline: none;
+  }
+  .beta-pulse-comment:focus {
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .beta-report {
+    margin: 16px 0;
+    animation: msgIn 0.3s ease-out;
+  }
+  .beta-report-content {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(59, 130, 246, 0.08));
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: var(--radius-sm);
+  }
+  .beta-report-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+  .beta-report-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .beta-stat {
+    text-align: center;
+    padding: 8px;
+    background: white;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border);
+  }
+  .beta-stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .beta-stat-label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+  }
+  .beta-report-section {
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .beta-report-section strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .beta-feedback-item {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .beta-report-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .beta-report-btn {
+    padding: 6px 14px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-xs);
+    background: white;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .beta-report-btn:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    color: rgb(59, 130, 246);
+  }
+
   /* ===== INPUT AREA ===== */
   .input-area {
     padding: 16px 24px 20px;
@@ -852,6 +1044,22 @@
   .brand-footer span {
     letter-spacing: 0.5px;
   }
+  .beta-end-btn {
+    margin-left: auto;
+    padding: 3px 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 10px;
+    background: none;
+    color: rgba(59, 130, 246, 0.5);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .beta-end-btn:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    color: rgb(59, 130, 246);
+    background: rgba(59, 130, 246, 0.05);
+  }
 
   /* ===== RESPONSIVE ===== */
   @media (max-width: 900px) {
@@ -984,6 +1192,217 @@ let currentMode = 'guided';
 let isStreaming = false;
 let deliverableHistory = [];  // Array of HTML strings
 let currentVersionIndex = -1; // -1 = no deliverables yet
+let userMessageCount = 0;     // Track user messages for mode discovery hint
+let modeHintShown = false;    // Only show the mode discovery hint once
+
+// ===== BETA TESTING INFRASTRUCTURE =====
+const BETA_TESTING = true; // Toggle off for production
+
+const betaSession = {
+  id: 'beta-' + Date.now(),
+  startTime: null,
+  userName: '',
+  events: [],        // Timestamped event log
+  pulseResponses: [], // Micro-question answers
+  modeChanges: [],   // Mode switch log
+  messageTimings: [], // Time between messages
+  lastMessageTime: null,
+  featuresUsed: new Set(), // copy, stop, preview, mode-change, version-nav
+  deliverableCount: 0,
+  urlsFetched: [],
+  fetchErrors: [],
+  pulseSchedule: [
+    { trigger: 'message_3', question: 'How natural does this conversation feel so far?', options: ['Very natural', 'Mostly natural', 'A bit robotic', 'Unnatural'] },
+    { trigger: 'after_analysis', question: 'Was the website analysis useful?', options: ['Very useful', 'Somewhat useful', 'Not very useful', 'Confusing'] },
+    { trigger: 'after_deliverable', question: 'How does this deliverable look?', options: ['Impressive', 'Good enough', 'Needs work', 'Not what I expected'] },
+    { trigger: 'message_8', question: 'Is FigStudio helping you move forward?', options: ['Definitely', 'Somewhat', 'Not really', 'I\'m stuck'] },
+    { trigger: 'end_session', question: 'Would you use FigStudio again for a real project?', options: ['Yes, definitely', 'Probably', 'Maybe', 'No'] }
+  ],
+  pulsesShown: new Set()
+};
+
+function betaLog(eventType, data = {}) {
+  if (!BETA_TESTING) return;
+  const event = {
+    type: eventType,
+    timestamp: new Date().toISOString(),
+    elapsed: betaSession.startTime ? Date.now() - betaSession.startTime : 0,
+    ...data
+  };
+  betaSession.events.push(event);
+}
+
+function betaTrackTiming() {
+  if (!BETA_TESTING) return;
+  const now = Date.now();
+  if (betaSession.lastMessageTime) {
+    const gap = now - betaSession.lastMessageTime;
+    betaSession.messageTimings.push({
+      gap,
+      afterMessage: userMessageCount,
+      timestamp: new Date().toISOString()
+    });
+  }
+  betaSession.lastMessageTime = now;
+}
+
+function betaTrackFeature(feature) {
+  if (!BETA_TESTING) return;
+  betaSession.featuresUsed.add(feature);
+  betaLog('feature_used', { feature });
+}
+
+function betaCheckPulse(trigger) {
+  if (!BETA_TESTING) return;
+  if (betaSession.pulsesShown.has(trigger)) return;
+
+  const pulse = betaSession.pulseSchedule.find(p => p.trigger === trigger);
+  if (!pulse) return;
+
+  betaSession.pulsesShown.add(trigger);
+
+  // Delay pulse slightly so it doesn't interrupt the flow
+  setTimeout(() => showBetaPulse(pulse), 2000);
+}
+
+function showBetaPulse(pulse) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'beta-pulse';
+  div.id = 'betaPulse-' + Date.now();
+
+  const optionsHtml = pulse.options.map((opt, i) =>
+    `<button class="beta-pulse-option" onclick="answerBetaPulse('${div.id}', '${pulse.trigger}', '${opt.replace(/'/g, "\\'")}', this)">${opt}</button>`
+  ).join('');
+
+  div.innerHTML = `
+    <div class="beta-pulse-content">
+      <div class="beta-pulse-badge">Beta feedback</div>
+      <div class="beta-pulse-question">${pulse.question}</div>
+      <div class="beta-pulse-options">${optionsHtml}</div>
+      <textarea class="beta-pulse-comment" placeholder="Any additional thoughts? (optional)" rows="1" onfocus="this.rows=2" onblur="if(!this.value)this.rows=1"></textarea>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function answerBetaPulse(divId, trigger, answer, btn) {
+  const div = document.getElementById(divId);
+  const comment = div.querySelector('.beta-pulse-comment')?.value || '';
+
+  betaSession.pulseResponses.push({
+    trigger,
+    answer,
+    comment,
+    timestamp: new Date().toISOString(),
+    messageCount: userMessageCount
+  });
+  betaLog('pulse_response', { trigger, answer, comment });
+
+  // Visual feedback
+  div.querySelectorAll('.beta-pulse-option').forEach(b => b.disabled = true);
+  btn.classList.add('selected');
+  div.querySelector('.beta-pulse-question').textContent = 'Thanks! 🙏';
+  div.querySelector('.beta-pulse-comment').style.display = 'none';
+  div.querySelector('.beta-pulse-options').style.opacity = '0.5';
+
+  // Fade out after 2s
+  setTimeout(() => {
+    div.style.opacity = '0';
+    div.style.transform = 'translateY(-8px)';
+    setTimeout(() => div.remove(), 300);
+  }, 2000);
+}
+
+function generateBetaReport() {
+  if (!BETA_TESTING) return null;
+
+  const duration = Date.now() - betaSession.startTime;
+  const avgTiming = betaSession.messageTimings.length > 0
+    ? betaSession.messageTimings.reduce((s, t) => s + t.gap, 0) / betaSession.messageTimings.length
+    : 0;
+
+  const report = {
+    sessionId: betaSession.id,
+    userName: betaSession.userName,
+    duration: Math.round(duration / 1000),
+    durationReadable: formatDuration(duration),
+    totalMessages: userMessageCount,
+    deliverableCount: betaSession.deliverableCount,
+    urlsFetched: betaSession.urlsFetched,
+    fetchErrors: betaSession.fetchErrors,
+    modeChanges: betaSession.modeChanges,
+    finalMode: currentMode,
+    featuresUsed: [...betaSession.featuresUsed],
+    averageResponseTime: Math.round(avgTiming / 1000) + 's',
+    messageTimings: betaSession.messageTimings,
+    pulseResponses: betaSession.pulseResponses,
+    eventLog: betaSession.events,
+    conversationLength: conversationHistory.length,
+    timestamp: new Date().toISOString()
+  };
+
+  return report;
+}
+
+function formatDuration(ms) {
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${m}m ${s}s`;
+}
+
+function exportBetaReport() {
+  const report = generateBetaReport();
+  if (!report) return;
+
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `figstudio-beta-${betaSession.id}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showBetaReport() {
+  const report = generateBetaReport();
+  if (!report) return;
+
+  // Check for end-of-session pulse first
+  betaCheckPulse('end_session');
+
+  // Show report after a short delay for the pulse
+  setTimeout(() => {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'beta-report';
+    div.innerHTML = `
+      <div class="beta-report-content">
+        <div class="beta-report-title">📊 Beta Session Report</div>
+        <div class="beta-report-stats">
+          <div class="beta-stat"><span class="beta-stat-value">${report.durationReadable}</span><span class="beta-stat-label">Duration</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${report.totalMessages}</span><span class="beta-stat-label">Messages</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${report.deliverableCount}</span><span class="beta-stat-label">Deliverables</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${report.averageResponseTime}</span><span class="beta-stat-label">Avg gap</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${report.featuresUsed.length}</span><span class="beta-stat-label">Features used</span></div>
+          <div class="beta-stat"><span class="beta-stat-value">${report.modeChanges.length}</span><span class="beta-stat-label">Mode switches</span></div>
+        </div>
+        ${report.pulseResponses.length > 0 ? `
+        <div class="beta-report-section">
+          <strong>Feedback collected:</strong>
+          ${report.pulseResponses.map(p => `<div class="beta-feedback-item">"${p.answer}" — ${p.trigger}${p.comment ? ` (${p.comment})` : ''}</div>`).join('')}
+        </div>` : ''}
+        <div class="beta-report-actions">
+          <button class="beta-report-btn" onclick="exportBetaReport()">📥 Export JSON</button>
+          <button class="beta-report-btn" onclick="navigator.clipboard.writeText(JSON.stringify(generateBetaReport(), null, 2)).then(() => this.textContent = 'Copied!')">📋 Copy to clipboard</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }, betaSession.pulsesShown.has('end_session') ? 0 : 3000);
+}
 
 // ===== SETUP =====
 async function startSession() {
@@ -991,6 +1410,9 @@ async function startSession() {
   if (!name) return;
 
   USER_NAME = name;
+  betaSession.startTime = Date.now();
+  betaSession.userName = name;
+  betaLog('session_start', { userName: name });
 
   document.getElementById('setupOverlay').style.display = 'none';
 
@@ -1073,6 +1495,42 @@ function addMessage(role, content) {
   return div;
 }
 
+function showModeHint() {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'mode-hint';
+  div.id = 'modeHint';
+
+  const modeNames = { quick: 'Quick', guided: 'Guided', thorough: 'Thorough' };
+  const currentName = modeNames[currentMode] || 'Guided';
+
+  div.innerHTML = `
+    <div class="mode-hint-content">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span>You're in <strong>${currentName}</strong> mode. Use the pills at the top to switch — <strong>Quick</strong> for faster answers, <strong>Thorough</strong> for deeper analysis.</span>
+      <button class="mode-hint-dismiss" onclick="dismissModeHint()">✕</button>
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+
+  // Auto-dismiss after 15 seconds
+  setTimeout(() => dismissModeHint(), 15000);
+}
+
+function dismissModeHint() {
+  const el = document.getElementById('modeHint');
+  if (el) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-8px)';
+    setTimeout(() => el.remove(), 300);
+  }
+}
+
 function addThinking(text) {
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
@@ -1136,6 +1594,9 @@ async function sendMessage() {
   updateSendBtn();
 
   conversationHistory.push({ role: 'user', content: text });
+  userMessageCount++;
+  betaTrackTiming();
+  betaLog('user_message', { messageNumber: userMessageCount, hasUrl: /https?:\/\//.test(text), length: text.length });
 
   isStreaming = true;
   document.getElementById('sendBtn').disabled = true;
@@ -1155,6 +1616,8 @@ async function sendMessage() {
         const urlData = await fetchUrl(urlMatch[0]);
         removeUrlAnalysis();
         if (urlData) {
+          betaSession.urlsFetched.push(urlMatch[0]);
+          betaLog('url_fetch_success', { url: urlMatch[0] });
           enhancedMessages.push({
             role: 'user',
             content: `[FigStudio tool result — web_fetch for ${urlMatch[0]}]\n\nPage title: ${urlData.title}\nMeta description: ${urlData.description}\nTechnology signals: ${urlData.tech}\n\n${urlData.content}\n\n[End of tool result. CRITICAL: Only use facts from the data above. Do NOT invent any person names, doctor names, owner names, or staff names — if no name appears in the data above, say "the business" or "the clinic" instead. If you need a name, ask the user. Now analyze this site and respond naturally.]`
@@ -1162,6 +1625,8 @@ async function sendMessage() {
         }
       } catch(e) {
         removeUrlAnalysis();
+        betaSession.fetchErrors.push(urlMatch[0]);
+        betaLog('url_fetch_error', { url: urlMatch[0], error: e.message });
         // Tell the AI the fetch failed so it can handle gracefully
         enhancedMessages.push({
           role: 'user',
@@ -1176,6 +1641,20 @@ async function sendMessage() {
     removeThinking();
     addMessage('assistant', response);
     conversationHistory.push({ role: 'assistant', content: response });
+    betaLog('assistant_response', { length: response.length, hasDeliverable: /```html-deliverable/.test(response) });
+
+    // Show mode discovery hint after 3rd user message (once only)
+    if (userMessageCount === 3 && !modeHintShown) {
+      modeHintShown = true;
+      showModeHint();
+    }
+
+    // Beta pulse triggers
+    if (userMessageCount === 3) betaCheckPulse('message_3');
+    if (userMessageCount === 8) betaCheckPulse('message_8');
+    if (urlMatch && betaSession.urlsFetched.length > 0) {
+      setTimeout(() => betaCheckPulse('after_analysis'), 5000);
+    }
   } catch(err) {
     removeThinking();
     removeUrlAnalysis();
@@ -1241,6 +1720,7 @@ function retryLastMessage(btn) {
 
 // ===== COPY MESSAGE =====
 function copyMessage(btn) {
+  betaTrackFeature('copy');
   const msg = btn.closest('.msg');
   const raw = msg.dataset.rawContent;
   if (!raw) return;
@@ -1278,6 +1758,7 @@ function copyMessage(btn) {
 let currentAbortController = null;
 
 function stopGeneration() {
+  betaTrackFeature('stop');
   if (currentAbortController) {
     currentAbortController.abort();
     currentAbortController = null;
@@ -1639,6 +2120,9 @@ function checkForDeliverable(content) {
     // Add to history
     deliverableHistory.push(html);
     currentVersionIndex = deliverableHistory.length - 1;
+    betaSession.deliverableCount++;
+    betaLog('deliverable_generated', { version: deliverableHistory.length });
+    betaCheckPulse('after_deliverable');
     showPreview(html);
     updateVersionUI();
   }
@@ -1709,6 +2193,7 @@ function updateVersionUI() {
 }
 
 function showVersion(delta) {
+  betaTrackFeature('version-nav');
   const newIndex = currentVersionIndex + delta;
   if (newIndex < 0 || newIndex >= deliverableHistory.length) return;
   currentVersionIndex = newIndex;
@@ -1750,9 +2235,14 @@ function getModeInstructions() {
 }
 
 function setMode(mode, el) {
+  const oldMode = currentMode;
   currentMode = mode;
   document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
+  if (oldMode !== mode) {
+    betaSession.modeChanges.push({ from: oldMode, to: mode, messageCount: userMessageCount, timestamp: new Date().toISOString() });
+    betaTrackFeature('mode-change');
+  }
 }
 
 // ===== HELPERS =====
@@ -1922,6 +2412,7 @@ document.getElementById('setupStart').disabled = true;
     <circle cx="50" cy="25" r="5" fill="#C41E3A"/>
   </svg>
   <span>FigSamurai</span>
+  <button class="beta-end-btn" onclick="showBetaReport()" title="End beta session and generate report">📊 End session</button>
 </div>
 
 </body>
